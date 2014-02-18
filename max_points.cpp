@@ -28,6 +28,10 @@ struct Point {
   int y;
   Point() : x(0), y(0) {}
   Point(int a, int b): x(a), y(b) {}
+
+  bool operator==(Point &other) {
+    return x == other.x && y == other.y;
+  }
 };
 
 
@@ -42,23 +46,20 @@ class Solution {
       if (points.size() <= 2)
         return points.size();
       sort(points.begin(), points.end(), compare_by_x);
-      int res = 2;
+      int res = 2, k, l, n, tmp;
       for (int i = 0; i < points.size();i++) {
-        int l;
-        for (l = i + 1; l < points.size() && points[l].x == points[i].x && points[i].y == points[l].y; l++);
+        for (l = i + 1; l < points.size() && points[l] == points[i]; l++);
         l--;
-        int n = l - i + 1; /* number of the same points */
+        n = l - i + 1; /* number of the same points */
         i = l;
         if (n > res) res = n;
         for (int j = i + 1; j < points.size(); j++) {
-            int l;
-            for (l = j + 1; l < points.size() && points[l].x == points[j].x && points[j].y == points[l].y; l++);
+            for (l = j + 1; l < points.size() && points[l] == points[j]; l++);
             l--;
-            int tmp = n + l - j + 1;
+            tmp = n + l - j + 1;
             j = l;
 
             if (points[i].x == points[j].x) {
-               int k;
                for (k = j+1; k < points.size() && points[k].x == points[j].x; k++);
                k--;
                tmp += k - j;
@@ -67,7 +68,7 @@ class Solution {
             }
 
             if (points[i].y == points[j].y) {
-              for (int k = j+1; k < points.size(); k++) {
+              for (k = j+1; k < points.size(); k++) {
                 if (points[k].y == points[j].y)
                   tmp++;
               }
@@ -81,10 +82,11 @@ class Solution {
             int x = points[j].x;
             int y = points[j].y;
 
-            for (int k = j+1; k < points.size(); k++) {
-              int xx = points[k].x, yy = points[k].y;
-              if ((xx - x)*dy == (yy -y)*dx)
+            for (k = j+1; k < points.size(); k++) {
+              if ((points[k].x - x)*dy == (points[k].y - y)*dx) {
                 tmp++;
+                j = k;
+              }
             }
             if (tmp > res) res = tmp;
         }
