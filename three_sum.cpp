@@ -29,29 +29,28 @@ using namespace std;
 class Solution {
 private:
     int abs(int n) {
-      if (n < 0)
-        return -n;
-      else
-        return n;
+      return n < 0 ? -n : n;
     }
 
     int bin_search(vector<int> &num, int target, int lo) {
       int hi = num.size() - 1;
       int mid;
+      int m;
 
       while (lo < hi - 1) {
         mid = lo + ((hi - lo) >> 1);
+        m = num[mid];
 
-        if (target == num[mid]) {
-          return num[mid];
-        } else if (target < num[mid]) {
+        if (target == m) {
+          return m;
+        } else if (target < m) {
           hi = mid;
         } else {
           lo = mid;
         }
       }
 
-      return abs(target - num[lo]) < abs(target - num[hi]) ? num[lo] : num[hi];
+      return abs(target - num[lo]) < abs(num[hi] - target) ? num[lo] : num[hi];
     }
 
 public:
