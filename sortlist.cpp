@@ -30,32 +30,6 @@ struct ListNode {
 
 class Solution {
   public:
-    ListNode *mergeList(ListNode *&n1, int len1, ListNode *&n2, int len2) {
-      if (0 == len2) {
-        return n1;
-      }
-
-      ListNode tmp(0);
-      ListNode *tail = &tmp;
-
-      while (len1 || len2) {
-        if (len2 == 0 || (len1 != 0 && n1->val < n2->val)) {
-          tail->next = n1;
-          n1 = n1->next;
-          len1--;
-        } else {
-          tail->next = n2;
-          n2 = n2->next;
-          len2--;
-        }
-        tail = tail->next;
-      }
-
-      n1 = n2;
-      n2 = tail;
-      return tmp.next;
-    }
-
     ListNode *sortList(ListNode *head) {
       int len = listLength(head);
       int n;
@@ -73,11 +47,23 @@ class Solution {
         while (n > 0) {
           int i;
           int l1 = min(sep, n);
-          for (i = 0, h2 = h1; i < l1; h2 = h2->next, i++);
           int l2 = min(sep, n - l1);
-          tail->next = mergeList(h1, sep, h2, l2);
-          tail = h2;
+          for (i = 0, h2 = h1; i < l1; h2 = h2->next, i++);
           n -= l1 + l2;
+
+          while (l1 || l2) {
+            if (l2 == 0 || (l1 != 0 && h1->val < h2->val)) {
+              tail->next = h1;
+              h1 = h1->next;
+              l1--;
+            } else {
+              tail->next = h2;
+              h2 = h2->next;
+              l2--;
+            }
+            tail = tail->next;
+          }
+          h1 = h2;
         }
       }
 
