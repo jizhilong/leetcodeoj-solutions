@@ -26,8 +26,6 @@ struct ListNode {
   ListNode *next;
   ListNode(int x) : val(x), next(NULL) {}
   ListNode(int x, ListNode *next) : val(x), next(next) {}
-
-
 };
 
 ListNode *fromArray(int *x, int len) {
@@ -47,7 +45,7 @@ class Solution {
   public:
     ListNode *sortList(ListNode *head) {
       int len = listLength(head);
-      int n;
+      int n, i, l1, l2;
       if (len <= 1)
         return head;
 
@@ -60,11 +58,10 @@ class Solution {
         h1 = tmp.next;
         n = len;
         while (n > 0) {
-          int i;
-          int l1 = min(sep, n);
-          int l2 = min(sep, n - l1);
-          for (i = 0, h2 = h1; i < l1; h2 = h2->next, i++);
+          l1 = min(sep, n);
+          l2 = min(sep, n - l1);
           n -= l1 + l2;
+          for (i = 0, h2 = h1; i < l1; h2 = h2->next, i++);
 
           while (l1 || l2) {
             if (l2 == 0 || (l1 != 0 && h1->val < h2->val)) {
@@ -78,7 +75,7 @@ class Solution {
             }
             tail = tail->next;
           }
-          h1 = h2;
+         h1 = h2;
         }
       }
 
