@@ -26,7 +26,22 @@ struct ListNode {
   ListNode *next;
   ListNode(int x) : val(x), next(NULL) {}
   ListNode(int x, ListNode *next) : val(x), next(next) {}
+
+
 };
+
+ListNode *fromArray(int *x, int len) {
+  if (x == NULL || len <= 0)
+    return NULL;
+
+  ListNode tmp(0);
+  ListNode *tail = &tmp;
+  for (int i = 0; i < len; i++) {
+    tail->next = new ListNode(x[i]);
+    tail = tail->next;
+  }
+  return tmp.next;
+}
 
 class Solution {
   public:
@@ -91,23 +106,10 @@ class Solution {
 int
 main(int argc, char *argv[])
 {
-  ListNode *head1 = new ListNode(4, 
-          new ListNode(19, 
-            new ListNode(14,
-              new ListNode(5,
-                new ListNode(-3,
-                  new ListNode(1,
-                    new ListNode(8,
-                      new ListNode(5,
-                        new ListNode(11,
-                          new ListNode(15, NULL))))))))));
-
-  ListNode *head2 = new ListNode(1, 
-      new ListNode(2, 
-        new ListNode(3,
-          new ListNode(4, 
-            new ListNode(5, NULL)))));
-
+  int arr1[] = {4, 19, 14, 5, -3, 1, 8, 5, 11, 15};
+  int arr2[] = {1, 2, 3, 4, 5};
+  ListNode *head1 = fromArray(arr1, 10);
+  ListNode *head2 = fromArray(arr2, 5);
 
   Solution solution;
   head1 = solution.sortList(head1);
