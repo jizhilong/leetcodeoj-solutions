@@ -44,31 +44,30 @@ ListNode *fromArray(int *x, int len) {
 class Solution {
   public:
     ListNode *sortList(ListNode *head) {
-      int len = listLength(head);
-      int n, i, l1, l2;
-      if (len <= 1)
+      if (head == NULL || head->next == NULL)
         return head;
+
       ListNode tmp(0);
+      ListNode *n, *h, *t;
       tmp.next = head;
-      for (int i = 1; i < len; i++) {
-
+      n = head->next;
+      head->next = NULL;
+      while (n) {
+        for (h = &tmp;h->next && h->next->val < n->val; h = h->next);
+        t = n;
+        n = n->next;
+        t->next = h->next;
+        h->next = t;
       }
-
-    }
-
-    int listLength(ListNode *head) {
-      int res = 0;
-      for (; head; head = head->next)
-        res++;
-      return res;
+      return tmp.next;
     }
 
     void printList(ListNode *head) {
-      for (; head; head = head->next)
+      while (head) {
         cout << head->val << endl;
-      cout << endl;
+        head = head->next;
+      }
     }
-
 };
 
 
