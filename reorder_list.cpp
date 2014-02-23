@@ -55,9 +55,7 @@ public:
         
         fast = inverseList(slow->next);
         slow->next = NULL;
-        slow = head;
-
-        intersectLists(slow, fast);
+        intersectLists(head, fast);
     }
     
     ListNode *inverseList(ListNode *head) {
@@ -72,34 +70,31 @@ public:
     }
     
     void intersectLists(ListNode *l1, ListNode *l2) {
-        ListNode *tmp, *res;
-        while (l1->next) {
-            tmp = l2->next;
-            l2->next = l1->next;
-            l1->next = l2;
-            l1 = l2->next;
-            l2 = tmp;
+        ListNode *node;
+        while (l1->next && l2) {
+            node = l2;
+            l2 = l2->next;
+            node->next = l1->next;
+            l1->next = node;
+            l1 = node->next;
         }
-        l1->next = l2;
+        if (l1->next == NULL)
+          l1->next = l2;
     }
 
     void printList(ListNode *head) {
       for (; head; head = head->next)
         cout << head->val << endl;
-      cout << endl;
     }
 };
 
 int
 main(int argc, char *argv[])
 {
-  int arr1[] = {1, 2, 3, 4};
-  int arr2[] = {-1,-2,-3,-4};
-  ListNode *head1 = fromArray(arr1, 4);
-  ListNode *head2 = fromArray(arr2, 4);
+  int arr1[] = {1, 2, 3, 4, 5};
+  ListNode *head1 = fromArray(arr1, 5);
   
   Solution solution;
-//  solution.intersectLists(head1, head2);
   solution.reorderList(head1);
   solution.printList(head1);
   return 0;
