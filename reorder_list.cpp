@@ -51,7 +51,7 @@ public:
             return;
         }
         ListNode *slow = head, *fast = head->next->next;
-        for (; fast && fast->next; slow = slow->next, fast = fast->next->next);
+        for (; fast && fast->next; slow = slow->next, fast = fast->next->next); /* find the medium node. */
         
         fast = inverseList(slow->next);
         slow->next = NULL;
