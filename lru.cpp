@@ -33,34 +33,48 @@ struct CacheNode {
   CacheNode *prev;
   CacheNode *next;
 
-  CacheNode():key(0),val(0),next(NULL) {}
+  CacheNode():key(0),val(0),prev(NULL), next(NULL) {}
   CacheNode(int x, int y): key(x), val(y), prev(NULL), next(NULL) {}
   CacheNode(int x, int y, CacheNode *p, CacheNode *n): key(x), val(y), prev(p), next(n) {}
+
+  void append(CacheNode *node) {
+    next->prev = node;
+    node->next = next;
+    node->prev= this;
+    next = node;
+  }
+
+  CacheNode *drop() {
+     prev->next = next;
+     next->prev = prev;
+     return this;
+  }
+
 };
 
 class LRUCache {
   private:
-    CacheNode *head, *tail;
+    CacheNode *head;
     int capacity;
     int size;
   public:
-    LRUCache(int capacity):capacity(capacity), size(0), head(NULL), tail(NULL) {
+    LRUCache(int capacity):capacity(capacity), size(0) {
+      head = new CacheNode();
+      head->next = head->prev = head;
     }
 
     CacheNode *getNode(int key) {
-      if (NULL == head)
+      CacheNode *h = head->next;
+      if (head == h)
         return NULL;
-      if (head  && head->key == key)
-        return head;
-      CacheNode *n;
-      for (n = head; head->next && head->next->key != key; head = head->next);
-      if (n->next == NULL)
+      if (h->key == key)
+        return h;
+      for (; h != head && h->key != key; h = h->next);
+
+      if (h == head)
         return NULL;
-      CacheNode *tmp = n->next;
-      n->next = n->next->next;
-      tmp->next = head;
-      head = tmp;
-      return head;
+      head->append(h->drop());
+      return h;
     }
 
     int get(int key) {
@@ -75,26 +89,28 @@ class LRUCache {
       if (node) {
         node->val = value;
       } else {
-        if (size == 0) {
-          head = tail = new CacheNode(key, value, NULL, NULL);
-          size++;
-        } else if (size == capacity) {
-          tail->key = key;
-          tail->val = value;
-
-          tail->prev->next = NULL;
-          node = tail->prev;
-          tail->prev = NULL;
-          tail->next = head;
-          head->prev = tail;
-          head = tail;
-          tail = node;
+        if (size == capacity) {
+          node = head->prev;
+          node->drop();
+          node->key = key;
+          node->val = value;
+          head->append(node);
         } else {
-          node = new CacheNode(key, value, NULL, head);
-          head->prev = node;
-          head = node;
+          head->append(new CacheNode(key, value));
           size++;
         }
       }
     }
 };
+
+
+int
+main(int argc, char *argv[])
+{
+  LRUCache lru(1);
+  lru.set(2, 1);
+  cout << lru.get(2) << endl;
+  lru.set(3, 2);
+  cout << lru.get(2) << endl;
+  cout << lru.get(3) << endl;
+}
