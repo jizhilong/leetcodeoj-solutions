@@ -25,6 +25,7 @@
  */
 
 #include <iostream>
+#include <map>
 using namespace std;
 
 struct CacheNode {
@@ -55,6 +56,7 @@ struct CacheNode {
 class LRUCache {
   private:
     CacheNode *head;
+    map<int, CacheNode *> cache;
     int capacity;
     int size;
   public:
@@ -63,41 +65,35 @@ class LRUCache {
       head->next = head->prev = head;
     }
 
-    CacheNode *getNode(int key) {
-      CacheNode *h = head->next;
-      if (head == h)
-        return NULL;
-      if (h->key == key)
-        return h;
-      for (; h != head && h->key != key; h = h->next);
-
-      if (h == head)
-        return NULL;
-      head->append(h->drop());
-      return h;
-    }
-
     int get(int key) {
-      CacheNode *node = getNode(key);
-      if (node)
-        return node->val;
-      return -1;
+      map<int, CacheNode *>:: iterator it = cache.find(key);
+      if (it == cache.end())
+        return -1;
+      CacheNode *node = it->second;
+      head->append(node->drop());
+      return it->second->val;
     }
 
     void set(int key, int value) {
-      CacheNode *node = getNode(key);
-      if (node) {
+      map<int, CacheNode *>:: iterator it = cache.find(key);
+      CacheNode *node;
+      if (it != cache.end()) {
+        node = it->second;
         node->val = value;
+        head->append(node->drop());
       } else {
         if (size == capacity) {
           node = head->prev;
+          cache.erase(cache.find(node->key));
           node->drop();
           node->key = key;
           node->val = value;
           head->append(node);
+          cache[key] = node;
         } else {
           head->append(new CacheNode(key, value));
           size++;
+          cache[key] = head->next;
         }
       }
     }
@@ -107,10 +103,11 @@ class LRUCache {
 int
 main(int argc, char *argv[])
 {
-  LRUCache lru(1);
+  LRUCache lru(2);
   lru.set(2, 1);
+  lru.set(1, 1);
+  lru.set(2, 3);
+  lru.set(4, 1);
+  cout << lru.get(1) << endl;
   cout << lru.get(2) << endl;
-  lru.set(3, 2);
-  cout << lru.get(2) << endl;
-  cout << lru.get(3) << endl;
 }
