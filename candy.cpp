@@ -31,7 +31,12 @@ const int D = 1;  /* climing direction: down */
 
 class Solution {
   public:
-    int candy_wave(int *count) {
+    int candy_wave(int *count) { 
+      /* how many candies at least should be prepared for a ratings peak,
+       * with count[0] as the number of kids on the left(upward) side 
+       * of the peak, and count[1] as the number of kids on the right(downward)
+       * side of the peak.
+       */
       int up = count[U], down = count[D];
       count[U] = count[D] = 0;
 
@@ -46,26 +51,28 @@ class Solution {
     }
 
     int candy(vector<int> &ratings) {
-      int len = ratings.size();
-      int count[] = {0, 1};
+      int len = ratings.size(); 
+      int count[] = {0, 1}; /* count of ratings on both sides of a peak */
       int total = 0;
 
       if (len == 0)
         return 0;
 
-      for (int i = 1, last = ratings[0], dir = D; i < len; last = ratings[i++], count[dir]++) {
-        if (ratings[i] == last) {             /* meet a same rating, split the line into two */
-          total += candy_wave(count); 
-          dir = D;
-        } else if (ratings[i] < last) {       /* going down */
+      for (int i = 1, last = ratings[0], dir = D; /* assuming we are going down initially */
+           i < len; 
+           last = ratings[i++], count[dir]++) {   /* add the new kid to the right side of the current peak */
+        if (ratings[i] == last) {                 /* meet a same rating, split the line into two */
+          total += candy_wave(count);             /* count the last peak's minimum candies required */
+          dir = D;                                /* as if we are on at the begining of new line */
+        } else if (ratings[i] < last) {           /* going down along the current peak */
           dir = D;                    
-        } else if (dir == D) {        /* meet a local minimum */
-            total += candy_wave(count);
-            dir = U;
+        } else if (dir == D) {                    /* a direction turn from downward to upward means the last point is a local minium*/
+            total += candy_wave(count);           /* count the last peak */
+            dir = U;                              /* and add the current kid to a new peak's upward side */
         } 
       }
       
-      total += candy_wave(count);
+      total += candy_wave(count);                 /* count the last peak */
       return total;
     }
 };
@@ -74,7 +81,7 @@ class Solution {
 int
 main()
 {
-  int arr[] = {1, 3, 5};
+  int arr[] = {1, 3, 5, 7};
   vector<int> ratings(arr, arr + sizeof(arr)/sizeof(int));
   Solution solution;
   cout << solution.candy(ratings) << endl;
