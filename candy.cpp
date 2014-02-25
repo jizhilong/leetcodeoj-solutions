@@ -24,7 +24,6 @@
  */
 #include <vector>
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 const int U = 0;  /* climing direction: up */
@@ -32,7 +31,10 @@ const int D = 1;  /* climing direction: down */
 
 class Solution {
   public:
-    int candy_wave(int up, int down) {
+    int candy_wave(int *count) {
+      int up = count[U], down = count[D];
+      count[U] = count[D] = 0;
+
       if (up == 0)
         return (down*(down+1))/2;
 
@@ -44,41 +46,26 @@ class Solution {
     }
 
     int candy(vector<int> &ratings) {
-      if (ratings.size() == 0)
-        return 0;
-      int count[] = {0, 1};
-      int dir = D; 
-      int last = ratings[0], j;
       int len = ratings.size();
+      int count[] = {0, 1};
       int total = 0;
 
-      for (int i = 1; i < len; i++) {
-        int rt = ratings[i];
-        if (rt == last) {
-          total += candy_wave(count[U], count[D]);
-          count[U] = 0;
-          count[D] = 1;
-          for (j = i+1; j < len && ratings[j] == rt; j++);
-          total += j - i - 1;
-          i = j - 1;
+      if (len == 0)
+        return 0;
+
+      for (int i = 1, last = ratings[0], dir = D; i < len; last = ratings[i++], count[dir]++) {
+        if (ratings[i] == last) {             /* meet a same rating, split the line into two */
+          total += candy_wave(count); 
           dir = D;
-        } else if (rt < last) {
-          count[D]++;
-          dir = D;
-        } else {
-          if (dir == D) {
-            total += candy_wave(count[U], count[D]);
+        } else if (ratings[i] < last) {       /* going down */
+          dir = D;                    
+        } else if (dir == D) {        /* meet a local minimum */
+            total += candy_wave(count);
             dir = U;
-            count[U] = 1;
-            count[D] = 0;
-          } else {
-            count[U]++;
-          }
-        }
-        last = rt;
+        } 
       }
       
-      total += candy_wave(count[U], count[D]);
+      total += candy_wave(count);
       return total;
     }
 };
