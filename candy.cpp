@@ -27,59 +27,58 @@
 #include <algorithm>
 
 using namespace std;
+const int U = 0;  /* climing direction: up */
+const int D = 1;  /* climing direction: down */
 
 class Solution {
   public:
-    int num(int should, int count) {
-      if (count <= 2)
-        return should*count;
-      return should*2 + count -2;
+    int candy_wave(int up, int down) {
+      if (up == 0)
+        return (down*(down+1))/2;
+
+      if (up >= down) {
+        return ((up+3)*up) / 2 + (down*(down+1)) / 2;
+      }
+
+      return ((up+2)*(up-1)) / 2 + ((down+2)*(down+1)) / 2;
     }
 
     int candy(vector<int> &ratings) {
-      vector<vector<int> > updown(2);
-      int downing = 1;
-      int total = 0;
+      if (ratings.size() == 0)
+        return 0;
+      int count[] = {0, 1};
+      int dir = D; 
+      int last = ratings[0], j;
       int len = ratings.size();
-      int start, end;
-      for (start = 0; start < len && ratings[start] == ratings[0]; start++);
-      --start;
-      for (end = len - 1; end >= start && ratings[end] == ratings[len-1]; end--);
-      end +=2;
-      
-      total += start + (len - end);
-//      cout << start << endl;
-//      cout << end << endl;
-//      cout << total << endl;
+      int total = 0;
 
-      for (int i = start; i < end;) {
-        int j, rt = ratings[i];
-        for (j = i+1; j < end && ratings[j] == rt; j++ ); /* count continueing same ratings */
-        updown[downing].push_back(j - i);
-        i = j;
-
-        if (j == end || (downing == 1 && ratings[j] > rt)) { /* get to a minimum point or reach the last rating  */
-          downing = 0;
-          int su = updown[0].size(), sd = updown[1].size();
-
-          for (int m = 0; m < su - 1; m++)
-            total += num(m+2, updown[0][m]);
-          for (int n = 0; n < sd; n++)
-            total += num(sd - n, updown[1][n]);
-
-          if (su > 0) {
-            if (updown[0][su-1] == 1)
-              total += max(1+su, sd);   /* how many candy should the kid with maximum rating get */
-            else
-              total += 1+su+sd+(updown[0][su-1]-2);
+      for (int i = 1; i < len; i++) {
+        int rt = ratings[i];
+        if (rt == last) {
+          total += candy_wave(count[U], count[D]);
+          count[U] = 0;
+          count[D] = 1;
+          for (j = i+1; j < len && ratings[j] == rt; j++);
+          total += j - i - 1;
+          i = j - 1;
+          dir = D;
+        } else if (rt < last) {
+          count[D]++;
+          dir = D;
+        } else {
+          if (dir == D) {
+            total += candy_wave(count[U], count[D]);
+            dir = U;
+            count[U] = 1;
+            count[D] = 0;
+          } else {
+            count[U]++;
           }
-          cout << "i = " << i << " total = " << total << endl;
-          updown[0].clear(); updown[1].clear();
-        } else if (downing == 0 && ratings[j] < rt){ /* get to a maximum point */
-          downing = 1;
         }
+        last = rt;
       }
-
+      
+      total += candy_wave(count[U], count[D]);
       return total;
     }
 };
@@ -88,7 +87,7 @@ class Solution {
 int
 main()
 {
-  int arr[] = {1, 2, 2, 1};
+  int arr[] = {1, 3, 5};
   vector<int> ratings(arr, arr + sizeof(arr)/sizeof(int));
   Solution solution;
   cout << solution.candy(ratings) << endl;
