@@ -32,13 +32,13 @@ ListNode *fromArray(int *x, int len) {
   if (x == NULL || len <= 0)
     return NULL;
 
-  ListNode tmp(0);
-  ListNode *tail = &tmp;
+  ListNode *res;
+  ListNode **node = &res;
   for (int i = 0; i < len; i++) {
-    tail->next = new ListNode(x[i]);
-    tail = tail->next;
+    *node = new ListNode(x[i]);
+    node = &(*node)->next;
   }
-  return tmp.next;
+  return res;
 }
 
 class Solution {
@@ -49,13 +49,13 @@ class Solution {
       if (len <= 1)
         return head;
 
-      ListNode tmp(0);
-      tmp.next = head;
-      ListNode *h1, *h2, *tail;
+      ListNode *res = head; 
+      ListNode **node;  /* *node points to the tail of the merged list */
+      ListNode *h1, *h2;
 
       for (int sep = 1; sep < len; sep *= 2) {
-        tail = &tmp;
-        h1 = tmp.next;
+        node = &res;
+        h1 = res;
         n = len;
         while (n > 0) {
           l1 = min(sep, n);
@@ -65,23 +65,22 @@ class Solution {
 
           while (l1 || l2) {
             if (l2 == 0 || (l1 != 0 && h1->val < h2->val)) {
-              tail->next = h1;
+              *node = h1;
               h1 = h1->next;
               l1--;
             } else {
-              tail->next = h2;
+              *node = h2;
               h2 = h2->next;
               l2--;
             }
-            tail = tail->next;
+            node = &(*node)->next;
           }
          h1 = h2;
         }
       }
 
-      if (tail)
-        tail->next = NULL;
-      return tmp.next;
+      *node = NULL;   /* set tail to NULL */
+      return res;
     }
 
     int listLength(ListNode *head) {

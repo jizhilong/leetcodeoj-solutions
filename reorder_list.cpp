@@ -35,13 +35,13 @@ ListNode *fromArray(int *x, int len) {
   if (x == NULL || len <= 0)
     return NULL;
 
-  ListNode tmp(0);
-  ListNode *tail = &tmp;
+  ListNode *res;
+  ListNode **tail = &res;
   for (int i = 0; i < len; i++) {
-    tail->next = new ListNode(x[i]);
-    tail = tail->next;
+    *tail = new ListNode(x[i]);
+    tail = &(*tail)->next;
   }
-  return tmp.next;
+  return res;
 }
 
 class Solution {
