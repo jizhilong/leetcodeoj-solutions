@@ -21,8 +21,6 @@
  * =====================================================================================
  */
 #include <vector>
-#include <unordered_set>
-#include <queue>
 #include <string>
 #include <iostream>
 
@@ -31,13 +29,13 @@ using namespace std;
 class Solution {
   public:
     int minCut(string s) {
-      vector<unordered_set<int> > dp(s.length(), unordered_set<int>());
+      vector<vector<bool> > dp(s.length(),vector<bool>(s.length(), false));
 
       for (int i = 0; i < s.length(); i++) {
-        dp[i].insert(i);
+        dp[i][i] = true;
         for (int j = i-1; j >= 0; j--) {
-          if (s[j] == s[i] && (j+1 == i || j+2 == i || dp[j+1].find(i-1) != dp[j+1].end()))
-            dp[j].insert(i);
+          if (s[j] == s[i] && (j+1 == i || j+2 == i || dp[j+1][i-1]))
+            dp[j][i] = true;
         }
       }
 
@@ -45,9 +43,9 @@ class Solution {
       dp2[s.length()] = -1;
 
       for (int i = s.length() - 1; i >= 0; i--) {
-        for (unordered_set<int>::iterator it = dp[i].begin(); it != dp[i].end(); it++) {
-          if (dp2[i] > dp2[1+*it]+1)
-            dp2[i] = dp2[1+*it]+1;
+        for (int j = i; j < s.length(); j++) {
+          if (dp[i][j] && dp2[i] > dp2[j+1]+1)
+              dp2[i] = dp2[j+1]+1;
         }
       }
 
