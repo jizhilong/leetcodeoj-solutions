@@ -41,28 +41,17 @@ class Solution {
         }
       }
 
-      queue<int> q;
-      queue<int> qs;
-      int last = s.length() - 1;
+      vector<int> dp2(s.length() + 1, s.length());
+      dp2[s.length()] = -1;
 
-      q.push(0);
-      qs.push(0);
-
-      while (!q.empty()) {
-        int i = q.front(); q.pop();
-        int vs = qs.front(); qs.pop();
-
-        for (unordered_set<int>::iterator it = dp[i].begin(); it != dp[i].end();it++) {
-            if (*it == last) {
-              return vs;
-            } else {
-              q.push(1+*it);
-              qs.push(vs+1);
-            }
+      for (int i = s.length() - 1; i >= 0; i--) {
+        for (unordered_set<int>::iterator it = dp[i].begin(); it != dp[i].end(); it++) {
+          if (dp2[i] > dp2[1+*it]+1)
+            dp2[i] = dp2[1+*it]+1;
         }
       }
 
-      return -1;
+      return dp2[0];
     }
 };
 
@@ -71,7 +60,7 @@ int
 main(int argc, char *argv[])
 {
   Solution solution;
-  string s = "fifgbeajcacehiicccfecbfhhgfiiecdcjjffbghdidbhbdbfbfjccgbbdcjheccfbhafehieabbdfeigbiaggchaeghaijfbjhi";
+  string s = argv[1];
   int res = solution.minCut(s);
 
   cout << res << endl;
