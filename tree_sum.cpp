@@ -41,12 +41,8 @@ class Solution {
       if (node->left == NULL && node->right == NULL)
         return acc;
 
-      int res = 0;
-      if (node->left)
-        res += sumNumbers(node->left, acc);
-      if (node->right)
-        res += sumNumbers(node->right, acc);
-      return res;
+      return node->left ? sumNumbers(node->left, acc):0 + \
+             node->right ? sumNumbers(node->right, acc):0;
     }
 
   public:
