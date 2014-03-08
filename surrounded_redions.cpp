@@ -48,38 +48,21 @@ class Solution {
       vector<vector<int> > record(height, vector<int>(width, -1));
       queue<cell> q;
 
+#define UPDATE(i, j) if (board[(i)][(j)] == 'O') {\
+  q.push(cell((i), (j)));\
+  record[(i)][(j)] = 1;\
+} else { \
+  record[(i)][(j)] = 0; \
+}
+
       for (int i = 0; i < width;i++) {
-        if (board[0][i] == 'O') {
-          q.push(cell(0, i));
-          record[0][i] = 1;
-        } else {
-          record[0][i] = 0;
-        }
-
-        if (board[height-1][i] == 'O') {
-          q.push(cell(height-1, i));
-          record[height-1][i] = 1;
-        } else {
-          record[height-1][i] = 0;
-        }
-
+        UPDATE(0, i);
+        UPDATE(height-1, i);
       }
 
       for (int i = 0; i < height; i++) {
-        if (board[i][width-1] == 'O') {
-          q.push(cell(i, width-1));
-          record[i][width-1] = 1;
-        } else {
-          record[i][width-1] = 0;
-        }
-
-        if (board[i][0] == 'O') {
-          q.push(cell(i, 0));
-          record[i][0] = 1;
-        } else {
-          record[i][0] = 0;
-        }
-
+        UPDATE(i, width-1);
+        UPDATE(i, 0);
       }
 
       while(!q.empty()) {
@@ -88,42 +71,22 @@ class Solution {
 
         j--;
         if (j >= 0 && record[i][j] == -1) {
-          if (board[i][j] == 'O') {
-            q.push(cell(i, j));
-            record[i][j] = 1;
-          } else {
-            record[i][j] = 0;
-          }
+          UPDATE(i, j);
         }
 
         j+=2;
         if (j < width && record[i][j] == -1) {
-          if (board[i][j] == 'O') {
-            q.push(cell(i, j));
-            record[i][j] = 1;
-          } else {
-            record[i][j] = 0;
-          }
+          UPDATE(i, j);
         }
 
         i--,j--;
         if (i >= 0 && record[i][j] == -1) {
-          if (board[i][j] == 'O') {
-            q.push(cell(i, j));
-            record[i][j] = 1;
-          } else {
-            record[i][j] = 0;
-          }
+          UPDATE(i, j);
         }
         
         i += 2;
         if (i < height && record[i][j] == -1) {
-          if (board[i][j] == 'O') {
-            q.push(cell(i, j));
-            record[i][j] = 1;
-          } else {
-            record[i][j] = 0;
-          }
+          UPDATE(i, j);
         }
       }
 
