@@ -20,6 +20,7 @@
  */
 
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -32,22 +33,35 @@ struct TreeNode {
 };
 
 class Solution {
-  private:
-    int sumNumbers(TreeNode *node, int acc) {
-      if (node == NULL)
-        return acc;
-
-      acc = acc*10 + node->val;
-      if (node->left == NULL && node->right == NULL)
-        return acc;
-
-      return node->left ? sumNumbers(node->left, acc):0 + \
-             node->right ? sumNumbers(node->right, acc):0;
-    }
-
   public:
     int sumNumbers(TreeNode *root) {
-      return sumNumbers(root, 0);
+      if (root == NULL)
+        return 0;
+      queue<TreeNode *> q; q.push(root);
+      queue<int>        qacc; qacc.push(0);
+      int sum = 0;
+
+      while (!q.empty()) {
+        TreeNode *node = q.front(); q.pop();
+        int acc = qacc.front(); qacc.pop();
+        acc = acc*10 + node->val;
+
+        if (node->left == NULL && node->right == NULL) {
+          sum += acc;
+        } else {
+          if (node->left) {
+            q.push(node->left);
+            qacc.push(acc);
+          }
+
+          if (node->right) {
+            q.push(node->right);
+            qacc.push(acc);
+          }
+        }
+      }
+
+      return sum;
     }
 };
 
