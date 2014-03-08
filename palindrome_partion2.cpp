@@ -29,9 +29,10 @@ using namespace std;
 class Solution {
   public:
     int minCut(string s) {
-      vector<vector<bool> > dp(s.length(),vector<bool>(s.length(), false));
+      int len = s.length();
+      vector<vector<bool> > dp(len,vector<bool>(len, false));
 
-      for (int i = 0; i < s.length(); i++) {
+      for (int i = 0; i < len; i++) {
         dp[i][i] = true;
         for (int j = i-1; j >= 0; j--) {
           if (s[j] == s[i] && (j+1 == i || j+2 == i || dp[j+1][i-1]))
@@ -39,13 +40,13 @@ class Solution {
         }
       }
 
-      vector<int> dp2(s.length() + 1, s.length());
-      dp2[s.length()] = -1;
+      vector<int> dp2(len+1, len);
+      dp2[len] = -1;
 
-      for (int i = s.length() - 1; i >= 0; i--) {
-        for (int j = i; j < s.length(); j++) {
+      for (int i = len - 1; i >= 0; i--) {
+        for (int j = i; j < len; j++) {
           if (dp[i][j] && dp2[i] > dp2[j+1]+1)
-              dp2[i] = dp2[j+1]+1;
+              dp2[i] = dp2[1+j]+1;
         }
       }
 
