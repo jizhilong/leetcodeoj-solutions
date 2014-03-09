@@ -22,7 +22,7 @@
  * =====================================================================================
  */
 #include <vector>
-#include <algorithm>
+#include <unordered_set>
 #include <iostream>
 
 using namespace std;
@@ -33,23 +33,19 @@ public:
     if (num.size() <= 1)
       return num.size();
 
-    sort(num.begin(), num.end());
+    unordered_set<int> set;
     int res = 0;
-    int tmp = 1;
-    int last = num[0];
 
-    for (int i = 1; i < num.size(); last = num[i++]) {
-      switch (num[i] - last) {
-        case 0:
-          break;
-        case 1:
-          tmp++;
-          break;
-        default:
-          if (tmp > res)
-            res = tmp;
-          tmp = 1;
-      }
+    for (auto it = num.begin(); it != num.end(); it++) {
+      set.insert(*it);
+    }
+
+    for (auto it = set.begin(); it != set.end(); it++) {
+      int count = 0, i = 0;
+      for (; set.find(*it - i) != set.end();set.erase(i), i++, count++);
+      for (i = 1; set.find(*it + i) != set.end();set.erase(i), i++, count++);
+      if (count > res)
+        res = count;
     }
 
     return res;
@@ -59,7 +55,7 @@ public:
 int
 main(int argc, char *argv[]) 
 {
-  vector<int> nums = {100, 4, 200, 1, 3, 2};
+  vector<int> nums = {0,3,7,2,5,8,4,6,0,1};
   Solution solution;
 
   cout << solution.longestConsecutive(nums) << endl;
