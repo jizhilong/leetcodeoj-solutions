@@ -40,32 +40,18 @@
 using namespace std;
 
 class Solution {
-  bool similar(string s1, string s2) {
-    bool diff = false;
-    for (int i = 0; i < s1.length(); i++) {
-        if (s1[i] != s2[i]) {
-          if (diff)
-            return false;
-          diff = true;
-        }
-    }
-
-    return diff;
-  }
-
   public:
     int ladderLength(string start, string end, unordered_set<string> &dict) {
-      dict.insert(start);
       dict.insert(end);
-      unordered_map<string, unordered_set<string> > map;
+      unordered_map<string, vector<string> > map;
 
-      for (unordered_set<string>::iterator it = dict.begin(); it != dict.end(); it++) {
+      for (auto it = dict.begin(); it != dict.end(); it++) {
           string tmp = *it;
           for (int i = 0; i < tmp.length(); i++) {
             tmp[i] = '\0';
             if (map.find(tmp) == map.end())
-              map[tmp] = unordered_set<string>();
-            map[tmp].insert(*it);
+              map[tmp] = vector<string>();
+            map[tmp].push_back(*it);
             tmp[i] = (*it)[i];
           }
       }
@@ -73,7 +59,6 @@ class Solution {
       unordered_set<string> set;
       queue<string> q;
       queue<int> lens;
-      int res = -1;
 
       set.insert(start);
       q.push(start);
@@ -84,9 +69,7 @@ class Solution {
         int len = lens.front(); lens.pop();
 
         if (tmp == end) {
-          if (res == -1 || res > len)
-            res = len;
-          continue;
+          return len;
         }
 
         for (int i = 0; i < tmp.length(); i++) {
@@ -107,7 +90,7 @@ class Solution {
         }
       }
 
-      return res == -1 ? 0 : res;
+      return 0;
     }
 };
 
