@@ -57,19 +57,17 @@ class Solution {
     int ladderLength(string start, string end, unordered_set<string> &dict) {
       dict.insert(start);
       dict.insert(end);
-      unordered_map<string, vector<string> > map;
+      unordered_map<string, unordered_set<string> > map;
 
       for (unordered_set<string>::iterator it = dict.begin(); it != dict.end(); it++) {
-          map[*it] = vector<string>();
-      }
-
-      for (auto it = dict.begin(); it != dict.end(); it++) {
-        for (auto it1 = next(it); it1 != dict.end(); it1++) {
-          if (similar(*it, *it1)) {
-            map[*it].push_back(*it1);
-            map[*it1].push_back(*it);
+          string tmp = *it;
+          for (int i = 0; i < tmp.length(); i++) {
+            tmp[i] = '\0';
+            if (map.find(tmp) == map.end())
+              map[tmp] = unordered_set<string>();
+            map[tmp].insert(*it);
+            tmp[i] = (*it)[i];
           }
-        }
       }
 
       unordered_set<string> set;
@@ -82,21 +80,30 @@ class Solution {
       lens.push(1);
 
       while (!q.empty()) {
-        string str = q.front(); q.pop();
+        string tmp = q.front(); q.pop();
         int len = lens.front(); lens.pop();
 
-        if (str == end) {
+        if (tmp == end) {
           if (res == -1 || res > len)
             res = len;
           continue;
         }
 
-        for (auto it = map[str].begin(); it != map[str].end(); it++) {
-          if (set.find(*it) == set.end()) {
-            q.push(*it);
-            lens.push(len+1);
-            set.insert(*it);
+        for (int i = 0; i < tmp.length(); i++) {
+          char tc = tmp[i];
+          tmp[i] = '\0';
+          if (map.find(tmp) == map.end()) {
+            tmp[i] = tc;
+            continue;
           }
+          for (auto it = map[tmp].begin(); it != map[tmp].end(); it++) {
+            if (set.find(*it) == set.end()) {
+              q.push(*it);
+              set.insert(*it);
+              lens.push(len+1);
+            }
+          }
+          tmp[i] = tc;
         }
       }
 
