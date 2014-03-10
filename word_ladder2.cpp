@@ -26,53 +26,74 @@
 using namespace std;
 
 struct TransNode {
-  string str;
+  int str;
   int lvl;
   TransNode *parent;
 
-  TransNode(string &s):str(s), lvl(0), parent(NULL){};
-  TransNode(string &s, TransNode *p):str(s), lvl(p->lvl+1), parent(p){};
+  TransNode(int s):str(s), lvl(0), parent(NULL){};
+  TransNode(int s, TransNode *p):str(s), lvl(p->lvl+1), parent(p){};
 };
 
 class Solution {
   public:
-    vector<vector<string> > findLadders(string start, string end, unordered_set<string> &dict) {
+    vector<vector<string> > findLadders(string start, string end, unordered_set<string> &dic) {
+      vector<string> dict(dic.begin(), dic.end());
+      dict.push_back(end);
+      dict.insert(dict.begin(), start);
+      unordered_map<string, vector<int> > map;
+
+      int starti = 0, endi = dict.size() - 1;
+
+      for (int i = 1; i < dict.size(); i++) {  /* record the variations of every word in dict */
+          string tmp = dict[i];
+          for (int j = 0; j < tmp.length(); j++) {
+            tmp[j] = '\0';
+            if (map.find(tmp) == map.end())
+              map[tmp] = vector<int>();
+            map[tmp].push_back(i);
+            tmp[j] = dict[i][j];
+          }
+      }
+
       queue<TransNode*> trans;
       vector<vector<string> > res;
-      unordered_map<string, int> map;
-      trans.push(new TransNode(start));
-      map[start] = 0;
+      vector<int> set(dict.size(), -1);
+      trans.push(new TransNode(starti));
+      set[starti] = 0;
 
       while (!trans.empty()) {
         TransNode *tran = trans.front(); trans.pop();
-        string tmp = tran->str;
+        int tmpi = tran->str;
+        string tmp = dict[tmpi];
 
         if (!res.empty() && tran->lvl >= res[0].size() - 1)
           break;
 
         for (int i = 0; i < tmp.length(); i++) {
-          char tc = tmp[i];
-          for (char c = 'a'; c <= 'z'; c++) {
-            if (c != tc) {
-              tmp[i] = c;
-              if (tmp == end) {
+          tmp[i] = '\0';
+          if (map.find(tmp) == map.end()) {
+            tmp[i] = dict[tmpi][i];
+            continue;
+          }
+
+          for (auto s = map[tmp].begin(); s != map[tmp].end(); s++) {
+              if (dict[*s] == end) {
                 res.push_back(vector<string>(tran->lvl+2));
                 res.back()[tran->lvl+1] = end;
                 for (TransNode *t = tran; t; t = t->parent)
-                  res.back()[t->lvl] = t->str;
-                goto endloop;
+                  res.back()[t->lvl] = dict[t->str];
+                break;
               }
-              if (res.empty() && dict.find(tmp) != dict.end() && 
-                  (map.find(tmp) == map.end() || map[tmp] == tran->lvl+1)) {
-                trans.push(new TransNode(tmp, tran));
-                map[tmp] = tran->lvl+1;
+
+              if (res.empty() && (set[*s] == -1 ||  set[*s] == tran->lvl+1)) {
+                trans.push(new TransNode(*s, tran));
+                set[*s] = tran->lvl+1;
               }
-              tmp[i] = tc;
             }
+
+          tmp[i] = dict[tmpi][i];
           }
         }
-endloop:;
-      }
 
       return res;
     }
@@ -96,12 +117,12 @@ main(int argc, char *argv[])
   Solution solution;
   vector<vector<string> > res = solution.findLadders(start, end, dict);
 
-  for (int i = 0; i < res.size(); i++) {
-    for (int j = 0; j < res[i].size(); j++) {
-      cout << res[i][j] << " ";
-    }
-    cout << endl;
-  }
+//  for (int i = 0; i < res.size(); i++) {
+//    for (int j = 0; j < res[i].size(); j++) {
+//      cout << res[i][j] << " ";
+//    }
+//    cout << endl;
+//  }
   cout << res.size() << " " << res[0].size() << endl;
 }
 
