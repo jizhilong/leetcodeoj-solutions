@@ -19,7 +19,9 @@
 #include <vector>
 #include <queue>
 #include <unordered_set>
+#include <unordered_map>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -37,7 +39,9 @@ class Solution {
     vector<vector<string> > findLadders(string start, string end, unordered_set<string> &dict) {
       queue<TransNode*> trans;
       vector<vector<string> > res;
+      unordered_map<string, int> map;
       trans.push(new TransNode(start));
+      map[start] = 0;
 
       while (!trans.empty()) {
         TransNode *tran = trans.front(); trans.pop();
@@ -58,8 +62,10 @@ class Solution {
                   res.back()[t->lvl] = t->str;
                 goto endloop;
               }
-              if (dict.find(tmp) != dict.end()) {
+              if (res.empty() && dict.find(tmp) != dict.end() && 
+                  (map.find(tmp) == map.end() || map[tmp] == tran->lvl+1)) {
                 trans.push(new TransNode(tmp, tran));
+                map[tmp] = tran->lvl+1;
               }
               tmp[i] = tc;
             }
@@ -75,15 +81,17 @@ endloop:;
 int
 main(int argc, char *argv[])
 {
-
-  string start = "hit";
-  string end = "cog";
+  string start;
+  string end;
+  string tmp;
   unordered_set<string> dict;
-  dict.insert("hot");
-  dict.insert("dot");
-  dict.insert("dog");
-  dict.insert("lot");
-  dict.insert("log");
+
+  getline(cin, start);
+  getline(cin, end);
+
+  while (getline(cin, tmp)) {
+    dict.insert(tmp);
+  }
 
   Solution solution;
   vector<vector<string> > res = solution.findLadders(start, end, dict);
@@ -94,5 +102,6 @@ main(int argc, char *argv[])
     }
     cout << endl;
   }
+  cout << res.size() << " " << res[0].size() << endl;
 }
 
