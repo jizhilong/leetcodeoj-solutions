@@ -28,15 +28,18 @@ typedef pair<int, char> t;
 class Solution {
   public:
     vector<vector<string> > findLadders(string start, string end, unordered_set<string> &dict) {
-      queue<string> q;
       queue<vector<t> > trans;
       vector<vector<t> > res;
       trans.push(vector<t>());
-      q.push(start);
 
-      while (!q.empty()) {
-        string tmp = q.front(); q.pop();
+      while (!trans.empty()) {
         vector<t> tran = trans.front(); trans.pop();
+
+        string tmp = start;
+
+        for (int i = 1; i < tran.size(); i++) {
+          tmp[tran[i].first] = tran[i].second;
+        }
 
         if (!res.empty() && tran.size() >= res[0].size())
           break;
@@ -52,7 +55,6 @@ class Solution {
                 goto endloop;
               }
               if (dict.find(tmp) != dict.end()) {
-                q.push(tmp);
                 trans.push(tran);
                 trans.back().push_back(t(i, c));
               }
