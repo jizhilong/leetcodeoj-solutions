@@ -71,29 +71,25 @@ class Solution {
 
         for (int i = 0; i < tmp.length(); i++) {
           tmp[i] = '\0';
-          if (map.find(tmp) == map.end()) {
-            tmp[i] = dict[tmpi][i];
-            continue;
-          }
 
           for (auto s = map[tmp].begin(); s != map[tmp].end(); s++) {
-              if (dict[*s] == end) {
-                res.push_back(vector<string>(tran->lvl+2));
-                res.back()[tran->lvl+1] = end;
-                for (TransNode *t = tran; t; t = t->parent)
-                  res.back()[t->lvl] = dict[t->str];
-                break;
-              }
-
-              if (res.empty() && (set[*s] == -1 ||  set[*s] == tran->lvl+1)) {
-                trans.push(new TransNode(*s, tran));
-                set[*s] = tran->lvl+1;
-              }
+            if (dict[*s] == end) {
+              res.push_back(vector<string>(tran->lvl+2));
+              res.back()[tran->lvl+1] = end;
+              for (TransNode *t = tran; t; t = t->parent)
+                res.back()[t->lvl] = dict[t->str];
+              break;
             }
 
-          tmp[i] = dict[tmpi][i];
+            if (res.empty() && (set[*s] == -1 ||  set[*s] == tran->lvl+1)) {
+              trans.push(new TransNode(*s, tran));
+              set[*s] = tran->lvl+1;
+            }
           }
+
+          tmp[i] = dict[tmpi][i];
         }
+      }
 
       return res;
     }
@@ -117,12 +113,12 @@ main(int argc, char *argv[])
   Solution solution;
   vector<vector<string> > res = solution.findLadders(start, end, dict);
 
-//  for (int i = 0; i < res.size(); i++) {
-//    for (int j = 0; j < res[i].size(); j++) {
-//      cout << res[i][j] << " ";
-//    }
-//    cout << endl;
-//  }
+  for (int i = 0; i < res.size(); i++) {
+    for (int j = 0; j < res[i].size(); j++) {
+      cout << res[i][j] << " ";
+    }
+    cout << endl;
+  }
   cout << res.size() << " " << res[0].size() << endl;
 }
 
