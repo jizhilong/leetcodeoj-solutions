@@ -21,9 +21,9 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <iostream>
-#include <fstream>
 
 using namespace std;
+
 
 struct TransNode {
   int str;
@@ -37,6 +37,7 @@ struct TransNode {
 class Solution {
   public:
     vector<vector<string> > findLadders(string start, string end, unordered_set<string> &dic) {
+      dic.erase(start); dic.erase(end);
       vector<string> dict(dic.begin(), dic.end());
       dict.push_back(end);
       dict.insert(dict.begin(), start);
@@ -66,22 +67,23 @@ class Solution {
         int tmpi = tran->str;
         string tmp = dict[tmpi];
 
-        if (!res.empty() && tran->lvl >= res[0].size() - 1)
+        if (!res.empty() && tran->lvl >= res[0].size()) /* the current level is greater than the shortest path's length */
           break;
+
+        if (tmp == end) {   /* meet another shortest path, add to result */
+          res.push_back(vector<string>(tran->lvl+1));
+          for (TransNode *t = tran; t; t = t->parent)
+            res.back()[t->lvl] = dict[t->str];
+          continue;
+        }
 
         for (int i = 0; i < tmp.length(); i++) {
           tmp[i] = '\0';
-
           for (auto s = map[tmp].begin(); s != map[tmp].end(); s++) {
-            if (dict[*s] == end) {
-              res.push_back(vector<string>(tran->lvl+2));
-              res.back()[tran->lvl+1] = end;
-              for (TransNode *t = tran; t; t = t->parent)
-                res.back()[t->lvl] = dict[t->str];
-              break;
-            }
-
-            if (res.empty() && (set[*s] == -1 ||  set[*s] == tran->lvl+1)) {
+            if (dict[*s] == dict[tmpi])
+              continue;
+              
+            if (set[*s] == -1 ||  set[*s] == tran->lvl+1) {
               trans.push(new TransNode(*s, tran));
               set[*s] = tran->lvl+1;
             }
