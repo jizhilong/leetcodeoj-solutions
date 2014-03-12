@@ -53,8 +53,7 @@ class Solution {
       Result r = _maxPathSum(node->right);
       int resl = node->val + max(0, max(l.resl, l.resr));
       int resr = node->val + max(0, max(r.resl, r.resr));
-      int res = node->val + ((node->left && max(l.resl, l.resr) > 0) ? max(l.resl, l.resr) : 0) +\
-                            ((node->right && max(r.resl, r.resr) > 0) ? max(r.resl, r.resr) : 0);
+      int res = resl + resr - node->val;
 
       if (node->left && l.res > res)
         res = l.res;
