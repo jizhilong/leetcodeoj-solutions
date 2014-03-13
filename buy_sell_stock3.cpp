@@ -24,68 +24,37 @@
 
 using namespace std;
 
-struct Trans {
-  int buy;
-  int sell;
-  int prof;
-
-  Trans(int x, int y):buy(x), sell(y), prof(sell-buy) {};
-};
-
 class Solution {
-  private:
-    int maxProfit(vector<int> &prices, int front, int to) {
-      if (to - front < 2)
-        return 0;
-      int res = 0;
-      int low = prices[front];
-
-      for (int i = front+1; i < to; i++) {
-        if (prices[i] < low) {
-          low = prices[i];
-        } else {
-          res = max(res, prices[i] - low);
-        }
-      }
-      return res;
-    }
-
   public:
     int maxProfit(vector<int> &prices) {
       if (prices.size() < 2)
         return 0;
-      vector<int> prefix(prices.size(), 0);
-      vector<int> pos(prices.size(), 0);
-      int res = 0;
+      vector<int> candidates(prices.size(), 0);
+      int resl = 0, resr = 0, result = 0;
       int low = prices[0];
+      int high = prices[0];
 
       for (int i = 1; i < prices.size(); i++) {
         if (prices[i] < low) {
           low = prices[i];
         } else {
-          res = max(res, prices[i] - low);
+          resl = max(resl, prices[i] - low);
         }
-        prefix[i] = res;
+        candidates[i] += resl;
       }
 
-      res = 0;
-      int high = pos[prices.size() - 1];
       for (int i = prices.size() -1 ;i >= 0; i--) {
         if (prices[i] > high) {
           high = prices[i];
         } else {
-          res = max(res, high - prices[i]);
+          resr = max(resr, high - prices[i]);
         }
-        pos[i] = res;
+        candidates[i] += resr;
+        if (candidates[i] > result)
+          result = candidates[i];
       }
 
-      res = 0;
-      for (int i = 0; i < prefix.size(); i++) {
-        if (prefix[i] + pos[i] > res)
-          res = prefix[i] + pos[i];
-      }
-
-      return res;
+      return result;
     }
 };
 
