@@ -53,10 +53,9 @@ class Solution {
       head = root; /* the left most node of the current row */
       while (head) { /* unlink the right most node the left most node of the next row */
         TreeLinkNode *nexthead = head->left ? head->left : head->right;
-        TreeLinkNode *tmp = head;
-        while (tmp->next != nexthead)
-          tmp = tmp->next;
-        tmp->next = NULL;
+        while (head->next != nexthead)
+          head = head->next;
+        head->next = NULL;
         while (nexthead && nexthead->left == NULL && nexthead->right == NULL)
           nexthead = nexthead->next;
         head = nexthead;
