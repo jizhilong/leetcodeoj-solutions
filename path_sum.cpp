@@ -18,7 +18,7 @@
  * =====================================================================================
  */
 #include <iostream>
-#include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -32,25 +32,25 @@ struct TreeNode {
 class Solution {
   public:
     bool hasPathSum(TreeNode *root, int sum) {
-      queue<TreeNode *> q;
-      queue<int> acc;
+      stack<TreeNode *> q;
+      stack<int> acc;
       if (root) {
         q.push(root);
         acc.push(root->val);
       }
 
       while (!q.empty()) {
-        TreeNode *node = q.front(); q.pop();
-        int cur = acc.front(); acc.pop();
+        TreeNode *node = q.top(); q.pop();
+        int cur = acc.top(); acc.pop();
         if (cur == sum && node->left == NULL && node->right == NULL)
           return true;
-        if (node->left) {
-          q.push(node->left);
-          acc.push(node->left->val + cur);
-        }
         if (node->right) {
           q.push(node->right);
           acc.push(node->right->val + cur);
+        }
+        if (node->left) {
+          q.push(node->left);
+          acc.push(node->left->val + cur);
         }
       }
 
