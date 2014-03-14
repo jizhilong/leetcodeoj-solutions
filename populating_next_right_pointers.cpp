@@ -38,7 +38,7 @@ class Solution {
     void connect(TreeLinkNode *root) {
       if (root == NULL)
         return;
-      int count = 1, level = 1;
+      int count = 1, level = 2;
       TreeLinkNode *node = root;;
       node->next = node->left;
 
@@ -48,8 +48,8 @@ class Solution {
           node->left->next = node->right;
           node->right->next = node->next ? node->next->left : NULL;
         }
-        if (count == 1 << level) {
-          level++;
+        if (count == level) {
+          level *= 2;
           TreeLinkNode *tmp = node->next;
           node->next = NULL;
           node = tmp;
