@@ -17,6 +17,7 @@
  */
 
 #include <iostream>
+#include <assert.h>
 
 using namespace std;
 
@@ -29,24 +30,31 @@ struct TreeNode {
 
 class Solution {
   private:
-    TreeNode *_flatten(TreeNode *root) {
-      if (root == NULL)
+    TreeNode *_flatten(TreeNode *root, TreeNode **tail) {
+      if (root == NULL) {
+        *tail = NULL;
         return NULL;
-      TreeNode *left = _flatten(root->left);
-      TreeNode *right = _flatten(root->right);
+      }
+      TreeNode *ltail;
+      TreeNode *rtail;
+      TreeNode *left = _flatten(root->left, &ltail);
+      TreeNode *right = _flatten(root->right, &rtail);
+      root->left = NULL;
       if (left == NULL) {
         root->right = right;
+        *tail = rtail ? rtail : root;
         return root;
       }
       root->right = left;
-      for (; left->right; left= left->right);
-      left->right = right;
+      ltail->right = right;
+      *tail = rtail ? rtail : ltail;
       return root;
     }
 
   public:
     void flatten(TreeNode *root) {
-      _flatten(root);
+      TreeNode *tail;
+      _flatten(root, &tail);
     }
 };
 
@@ -62,7 +70,9 @@ main(int argc, char *argv[]) {
   Solution solution;
   solution.flatten(root);
 
-  for (TreeNode *tmp = root; tmp; tmp = tmp->right)
+  for (TreeNode *tmp = root; tmp; tmp = tmp->right) {
     cout << tmp->val << " ";
+    assert(tmp->left == NULL);
+  }
   cout << endl;
 }
