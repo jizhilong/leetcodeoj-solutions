@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <queue>
 
 using namespace std;
 
@@ -29,25 +30,29 @@ struct TreeNode {
 };
 
 class Solution {
-  private:
-    bool isSymmetric(TreeNode *left, TreeNode *right) {
-      if (left == NULL && right == NULL)
-        return true;
-      if (left == NULL || right == NULL)
-        return false;
-      if (left->val == right->val) {
-        return (isSymmetric(left->left, right->right) && 
-               isSymmetric(left->right, right->left));
-      } else {
-        return false;
-      }
-    }
-
   public:
     bool isSymmetric(TreeNode *root) {
       if (NULL == root)
         return true;
-      return isSymmetric(root->left, root->right);
+      queue<TreeNode *> lefts;
+      queue<TreeNode *> rights;
+      lefts.push(root->left);
+      rights.push(root->right);
+
+      while (!lefts.empty()) {
+        TreeNode *left = lefts.front(); lefts.pop();
+        TreeNode *right= rights.front(); rights.pop();
+        if (left == NULL && right == NULL)
+          continue;
+        if (left == NULL || right == NULL)
+          return false;
+        if (left->val != right->val)
+          return false;
+        lefts.push(left->left); rights.push(right->right);
+        lefts.push(left->right); rights.push(right->left);
+      }
+
+      return true;
     }
 };
 
