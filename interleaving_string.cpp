@@ -41,20 +41,19 @@ class Solution {
       while (!q1.empty() && !q2.empty()) {
         int i1 = q1.top(), i2 = q2.top();
         int i = i1+i2;
+        cout << i1 << " " << i2 << endl;
 
         if (i1 == s1.length()) {
           for (; i2 < s2.length() && s2[i2] == s3[i1+i2]; i2++);
           if (i2 == s2.length())
             return true;
           q1.pop(); q2.pop();
-       }
-       else if (i2 == s2.length()) {
+       } else if (i2 == s2.length()) {
           for (; i1 < s1.length() && s1[i1] == s3[i1+i2]; i1++);
           if (i1 == s1.length())
             return true;
           q1.pop(); q2.pop();
-       }
-       else if (s1[i1] == s3[i]) {
+       } else if (s1[i1] == s3[i]) {
          q1.pop(); q1.push(i1+1);
          if (s2[i2] == s3[i]) {
            q1.push(i1); q2.push(i2+1);
@@ -68,7 +67,6 @@ class Solution {
       }
 
       return false;
-
     }
 };
 
@@ -78,20 +76,20 @@ main()
   Solution solution;
 
 
-  string s4 = "bbaca";
-  string s5 = "bbabaacbabaaaa";
-  string s6 = "bbbabacaaabcbabaaaa";
-  assert(!solution.isInterleave(s4, s5, s6));
-
-  string s7 = "aabcc";
-  string s8 = "dbbca";
-  string s9 = "aadbbcbcac";
-  assert(solution.isInterleave(s7, s8, s9));
-
-  string sa = "cacccaa";
-  string sb = "acccaacabbbab";
-  string sc = "accccaaaccccabbaabab";
-  assert(solution.isInterleave(sa, sb, sc));
+//  string s4 = "bbaca";
+//  string s5 = "bbabaacbabaaaa";
+//  string s6 = "bbbabacaaabcbabaaaa";
+//  assert(!solution.isInterleave(s4, s5, s6));
+//
+//  string s7 = "aabcc";
+//  string s8 = "dbbca";
+//  string s9 = "aadbbcbcac";
+//  assert(solution.isInterleave(s7, s8, s9));
+//
+//  string sa = "cacccaa";
+//  string sb = "acccaacabbbab";
+//  string sc = "accccaaaccccabbaabab";
+//  assert(solution.isInterleave(sa, sb, sc));
 
   string s1 = "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa";
   string s2 = "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab";
