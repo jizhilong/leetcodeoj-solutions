@@ -54,12 +54,12 @@ class Solution {
             return true;
           q1.pop(); q2.pop();
        }
-       else if (i1 < s1.length() && s1[i1] == s3[i]) {
+       else if (s1[i1] == s3[i]) {
          q1.pop(); q1.push(i1+1);
-         if (i2 < s2.length() && s2[i2] == s3[i]) {
+         if (s2[i2] == s3[i]) {
            q1.push(i1); q2.push(i2+1);
          } 
-       } else if (i2 < s2.length() && s2[i2] == s3[i]) {
+       } else if (s2[i2] == s3[i]) {
          q2.pop(); q2.push(i2+1);
        } else {
          q1.pop();
@@ -75,20 +75,26 @@ class Solution {
 int
 main()
 {
-// string s1 = "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa";
-// string s2 = "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab";
-// string s3 = "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab";
-// string s1 = "bbaca";
-// string s2 = "bbabaacbabaaaa";
-// string s3 = "bbbabacaaabcbabaaaa";
-//  string s1 = "aabcc";
-//  string s2 = "dbbca";
-//  string s3 = "aadbbcbcac";
-//  string s4 = "aabccdbbca";
-  string s1 = "cacccaa";
-  string s2 = "acccaacabbbab";
-  string s3 = "accccaaaccccabbaabab";
   Solution solution;
 
-  assert(solution.isInterleave(s1, s2, s3));
+
+  string s4 = "bbaca";
+  string s5 = "bbabaacbabaaaa";
+  string s6 = "bbbabacaaabcbabaaaa";
+  assert(!solution.isInterleave(s4, s5, s6));
+
+  string s7 = "aabcc";
+  string s8 = "dbbca";
+  string s9 = "aadbbcbcac";
+  assert(solution.isInterleave(s7, s8, s9));
+
+  string sa = "cacccaa";
+  string sb = "acccaacabbbab";
+  string sc = "accccaaaccccabbaabab";
+  assert(solution.isInterleave(sa, sb, sc));
+
+  string s1 = "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa";
+  string s2 = "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab";
+  string s3 = "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab";
+  assert(!solution.isInterleave(s1, s2, s3));
 }
