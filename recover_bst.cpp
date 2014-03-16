@@ -34,18 +34,38 @@ class Solution {
   private:
     TreeNode *s1, *s2, *pre;
     void inorder(TreeNode *root) {
-      if (root == NULL)
-        return;
-      inorder(root->left);
-      if (pre && root->val < pre->val) {
-        if (s1 == NULL) {
-          s1 = pre;
-        }
-        s2 = root;
-      }
 
-      pre = root;
-      inorder(root->right);
+      TreeNode *cur;
+      cur = root;
+
+      while (cur) {
+        if (cur->left == NULL) {
+          if (pre && cur->val < pre->val) {
+            if (s1 == NULL)
+              s1 = pre;
+            s2 = cur;
+          }
+          pre = cur;
+          cur = cur->right;
+        } else {
+          TreeNode *tmp = cur->left;
+          while (tmp->right && tmp->right != cur)
+            tmp = tmp->right;
+          if (tmp->right == NULL) {
+            tmp->right = cur;
+            cur = cur->left;
+          } else {
+            tmp->right = NULL;
+            if (pre && cur->val < pre->val) {
+              if (s1 == NULL)
+                s1 = pre;
+              s2 = cur;
+            }
+            pre = cur;
+            cur = cur->right;
+          }
+        }
+      }
     }
 
   public:
