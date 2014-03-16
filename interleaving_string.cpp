@@ -25,7 +25,7 @@
  */
 
 #include <iostream>
-#include <stack>
+#include <vector>
 #include <assert.h>
 
 using namespace std;
@@ -33,40 +33,27 @@ using namespace std;
 class Solution {
   public:
     bool isInterleave(string s1, string s2, string s3) {
-      if (s1.length() + s2.length() != s3.length())
+      int l1 = s1.length(), l2 = s2.length();
+      if (l1 + l2 != s3.length())
         return false;
-      stack<int> q1, q2;
-      q1.push(0); q2.push(0);
+      vector<vector<bool> > dp(l1+1, vector<bool>(l2+1, false));
+      dp[0][0] = true;  /* dp[i][j] means whether s1[0:i] and s2[0:j] can form s3[0:i+j] interleavely */
 
-      while (!q1.empty() && !q2.empty()) {
-        int i1 = q1.top(), i2 = q2.top();
-        int i = i1+i2;
-        cout << i1 << " " << i2 << endl;
-
-        if (i1 == s1.length()) {
-          for (; i2 < s2.length() && s2[i2] == s3[i1+i2]; i2++);
-          if (i2 == s2.length())
-            return true;
-          q1.pop(); q2.pop();
-       } else if (i2 == s2.length()) {
-          for (; i1 < s1.length() && s1[i1] == s3[i1+i2]; i1++);
-          if (i1 == s1.length())
-            return true;
-          q1.pop(); q2.pop();
-       } else if (s1[i1] == s3[i]) {
-         q1.pop(); q1.push(i1+1);
-         if (s2[i2] == s3[i]) {
-           q1.push(i1); q2.push(i2+1);
-         } 
-       } else if (s2[i2] == s3[i]) {
-         q2.pop(); q2.push(i2+1);
-       } else {
-         q1.pop();
-         q2.pop();
-       }
+      for (int i = 0; i <= l1; i++) {
+        for (int j = 0; j <= l2; j++) {
+          if (!dp[i][j]) {
+            continue;
+          }
+          if (i < l1 && s1[i] == s3[i+j]) {
+            dp[i+1][j] = true;
+          }
+          if (j < l2 && s2[j] == s3[i+j]) {
+            dp[i][j+1] = true;
+          }
+        }
       }
 
-      return false;
+      return dp[l1][l2];
     }
 };
 
@@ -76,20 +63,20 @@ main()
   Solution solution;
 
 
-//  string s4 = "bbaca";
-//  string s5 = "bbabaacbabaaaa";
-//  string s6 = "bbbabacaaabcbabaaaa";
-//  assert(!solution.isInterleave(s4, s5, s6));
-//
-//  string s7 = "aabcc";
-//  string s8 = "dbbca";
-//  string s9 = "aadbbcbcac";
-//  assert(solution.isInterleave(s7, s8, s9));
-//
-//  string sa = "cacccaa";
-//  string sb = "acccaacabbbab";
-//  string sc = "accccaaaccccabbaabab";
-//  assert(solution.isInterleave(sa, sb, sc));
+  string s4 = "bbaca";
+  string s5 = "bbabaacbabaaaa";
+  string s6 = "bbbabacaaabcbabaaaa";
+  assert(!solution.isInterleave(s4, s5, s6));
+
+  string s7 = "aabcc";
+  string s8 = "dbbca";
+  string s9 = "aadbbcbcac";
+  assert(solution.isInterleave(s7, s8, s9));
+
+  string sa = "cacccaa";
+  string sb = "acccaacabbbab";
+  string sc = "accccaaaccccabbaabab";
+  assert(solution.isInterleave(sa, sb, sc));
 
   string s1 = "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa";
   string s2 = "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab";
