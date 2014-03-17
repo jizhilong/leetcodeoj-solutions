@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <assert.h>
 
 using namespace std;
@@ -38,18 +39,21 @@ class Solution {
         return false;
       vector<vector<bool> > dp(l1+1, vector<bool>(l2+1, false));
       dp[0][0] = true;  /* dp[i][j] means whether s1[0:i] and s2[0:j] can form s3[0:i+j] interleavely */
+      queue<int> q;
+      q.push(0); q.push(0);
 
-      for (int i = 0; i <= l1; i++) {
-        for (int j = 0; j <= l2; j++) {
-          if (!dp[i][j]) {
-            continue;
-          }
-          if (i < l1 && s1[i] == s3[i+j]) {
-            dp[i+1][j] = true;
-          }
-          if (j < l2 && s2[j] == s3[i+j]) {
-            dp[i][j+1] = true;
-          }
+      while (!q.empty()) {
+        int i = q.front(); q.pop();
+        int j = q.front(); q.pop();
+        char c = s3[i+j];
+
+        if (i < l1 && c == s1[i] && !dp[i+1][j]) {
+          dp[i+1][j] = true;
+          q.push(i+1);q.push(j);
+        }
+        if (j < l2 && c == s2[j] && !dp[i][j+1]) {
+          dp[i][j+1] = true;
+          q.push(i);q.push(j+1);
         }
       }
 
