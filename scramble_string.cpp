@@ -37,7 +37,7 @@
  */
 #include <string>
 #include <iostream>
-#include <queue>
+#include <algorithm>
 #include <assert.h>
 
 using namespace std;
@@ -46,35 +46,41 @@ class Solution {
   private:
     string s1, s2;
 
-    bool equal(int i1, int j1, int i2, int j2) {
-      for (; i1 < j1 && i2 < j2 && s1[i1] == s2[i2]; i1++, i2++);
-      return i1 == j1;
-    }
-
-    bool _isScramble(int i1, int j1, int i2, int j2) {
-      if (j1 == i1)
-        return true;
-      if (j1 == i1 + 1)
-        return s1[i1] == s2[i2];
-      if (j1 == i1 + 2)
-        return s1[i1] == s2[i2+1] && s1[i1+1] == s2[i2];
-
-      if (equal(i1, j1, i2, j2))
+    bool _isScramble(string s1, string s2) {
+      int len = s1.length();
+      if (s1 == s2)
         return true;
 
-      int len = j1 - i1;
+      string tmp1 = s1, tmp2 = s2;
+      sort(tmp1.begin(), tmp1.end());
+      sort(tmp2.begin(), tmp2.end());
+      if (tmp1 != tmp2)
+        return false;
+
       for (int i = 1; i < len; i++) {
-        if ((_isScramble(i1, i1+i, i2, i2+i) && _isScramble(i1+i, j1, i2+i, j2)) || \
-           (_isScramble(i1, i1+i, i2+len-i, j2) && _isScramble(i1+i, j1, i2, i2+len-i)))
-             return true;
+        string l1 = s1.substr(0, i);
+        string r1 = s1.substr(i);
+        string l2 = s2.substr(0, i);
+        string r2 = s2.substr(i);
+
+        if (_isScramble(l1, l2) && _isScramble(r1, r2))
+          return true;
+
+        l2 = s2.substr(len-i);
+        r2 = s2.substr(0, len-i);
+
+        if (_isScramble(l1, l2) && _isScramble(r1, r2))
+          return true;
       }
 
       return false;
     }
+
   public:
-    bool isScramble(string str1, string str2) {
-      s1 = str1; s2 = str2;
-      return _isScramble(0, s1.length(), 0, s2.length());
+    bool isScramble(string s1, string s2) {
+      if (s1.length() != s2.length())
+        return false;
+      return _isScramble(s1, s2);
     }
 };
 
@@ -89,9 +95,18 @@ main()
   string s5 = "tae";
   string s6 = "abcdefghijklmnopq";
   string s7 = "efghijklmnopqcadb";
+  string s8 = "ccabcbabcbabbbbcbb";
+  string s9 = "bbbbabccccbbbabcba";
+  string s10 = "ymjmfxshglxwrrgufcvvzjuietjzzz";
+  string s11 = "fxczujvmwizrzgxgjmvzelyjthusrf";
+  string s12 = "xstjzkfpkggnhjzkpfjoguxvkbuopi";
+  string s13 = "xbouipkvxugojfpkzjhnggkpfkzjts";
 
   assert(solution.isScramble(s1, s2));
   assert(solution.isScramble(s1, s3));
   assert(solution.isScramble(s4, s5));
   assert(!solution.isScramble(s6, s7));
+  assert(!solution.isScramble(s8, s9));
+  assert(!solution.isScramble(s10, s11));
+  assert(solution.isScramble(s12, s13));
 }
