@@ -44,36 +44,37 @@ using namespace std;
 
 class Solution {
   private:
-    vector<string> scrambles(string s) {
-      if (s.length() <= 1)
-         return vector<string>();
-      vector<string> res;
-      for (int i = 1; i < s.length(); i++) {
-        string left = s.substr(0, i);
-        string right = s.substr(i, s.length() - i);
-        vector<string> lscrambles = scrambles(left);
-        vector<string> rscrambles = scrambles(right);
-        res.push_back(right + left);
-        for (auto itl = lscrambles.begin(); itl != lscrambles.end(); itl++) {
-          for (auto itr = rscrambles.begin(); itr != rscrambles.end(); itr++) {
-            res.push_back(left+*itr);
-            res.push_back(*itl+right);
-            res.push_back(*itl+*itr);
-          }
-        }
-      }
+    string s1, s2;
 
-      return res;
+    bool equal(int i1, int j1, int i2, int j2) {
+      for (; i1 < j1 && i2 < j2 && s1[i1] == s2[i2]; i1++, i2++);
+      return i1 == j1;
     }
 
-  public:
-    bool isScramble(string s1, string s2) {
-      vector<string> scrambles1 = scrambles(s1);
-      for (auto it = scrambles1.begin(); it != scrambles1.end(); it++) {
-        if (*it == s2)
-          return true;
+    bool _isScramble(int i1, int j1, int i2, int j2) {
+      if (j1 == i1)
+        return true;
+      if (j1 == i1 + 1)
+        return s1[i1] == s2[i2];
+      if (j1 == i1 + 2)
+        return s1[i1] == s2[i2+1] && s1[i1+1] == s2[i2];
+
+      if (equal(i1, j1, i2, j2))
+        return true;
+
+      int len = j1 - i1;
+      for (int i = 1; i < len; i++) {
+        if ((_isScramble(i1, i1+i, i2, i2+i) && _isScramble(i1+i, j1, i2+i, j2)) || \
+           (_isScramble(i1, i1+i, i2+len-i, j2) && _isScramble(i1+i, j1, i2, i2+len-i)))
+             return true;
       }
+
       return false;
+    }
+  public:
+    bool isScramble(string str1, string str2) {
+      s1 = str1; s2 = str2;
+      return _isScramble(0, s1.length(), 0, s2.length());
     }
 };
 
@@ -83,7 +84,14 @@ main()
   Solution solution;
   string s1 = "great";
   string s2 = "rgeat";
-  string s3 = s1;
+  string s3 = "rgtae";
+  string s4 = "eat";
+  string s5 = "tae";
+  string s6 = "abcdefghijklmnopq";
+  string s7 = "efghijklmnopqcadb";
 
   assert(solution.isScramble(s1, s2));
+  assert(solution.isScramble(s1, s3));
+  assert(solution.isScramble(s4, s5));
+  assert(!solution.isScramble(s6, s7));
 }
