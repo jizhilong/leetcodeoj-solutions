@@ -37,7 +37,7 @@
  */
 #include <string>
 #include <iostream>
-#include <algorithm>
+#include <vector>
 #include <assert.h>
 
 using namespace std;
@@ -46,30 +46,39 @@ class Solution {
   private:
     string s1, s2;
 
-    bool _isScramble(string s1, string s2) {
-      int len = s1.length();
-      if (s1 == s2)
+    inline bool equal(int i1, int j1, int i2, int j2) {
+      for (; i1 < j1 && i2 < j2 && s1[i1] == s2[i2]; i1++, i2++);
+      return i1 == j1;
+    }
+
+    inline bool sameChars(int i1, int j1, int i2, int j2) {
+      vector<int> chars(26, 0);
+
+      for (; i1 < j1 && i2 < j2; i1++, i2++) {
+        chars[s1[i1] - 'a']++;
+        chars[s2[i2] - 'a']--;
+      }
+
+      int i;
+      for (i = 0; i < 26 && chars[i] == 0; i++);
+
+      return i == 26;
+    }
+
+    bool _isScramble(int i1, int j1, int i2, int j2) {
+      int len = j1 - i1;
+      if (0 == len)
         return true;
 
-      string tmp1 = s1, tmp2 = s2;
-      sort(tmp1.begin(), tmp1.end());
-      sort(tmp2.begin(), tmp2.end());
-      if (tmp1 != tmp2)
+      if (equal(i1, j1, i2, j2)) 
+        return true;
+
+      if (!sameChars(i1, j1, i2, j2)) 
         return false;
 
       for (int i = 1; i < len; i++) {
-        string l1 = s1.substr(0, i);
-        string r1 = s1.substr(i);
-        string l2 = s2.substr(0, i);
-        string r2 = s2.substr(i);
-
-        if (_isScramble(l1, l2) && _isScramble(r1, r2))
-          return true;
-
-        l2 = s2.substr(len-i);
-        r2 = s2.substr(0, len-i);
-
-        if (_isScramble(l1, l2) && _isScramble(r1, r2))
+        if ((_isScramble(i1, i1+i, i2, i2+i) && _isScramble(i1+i, j1, i2+i, j2)) || \
+           (_isScramble(i1, i1+i, i2+len-i, j2) && _isScramble(i1+i, j1, i2, i2+len-i)))
           return true;
       }
 
@@ -77,10 +86,11 @@ class Solution {
     }
 
   public:
-    bool isScramble(string s1, string s2) {
+    bool isScramble(string str1, string str2) {
+      s1 = str1; s2 = str2;
       if (s1.length() != s2.length())
         return false;
-      return _isScramble(s1, s2);
+      return _isScramble(0, s1.length(), 0, s2.length());
     }
 };
 
