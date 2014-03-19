@@ -36,6 +36,7 @@
  * =====================================================================================
  */
 #include <string>
+#include <string.h>
 #include <iostream>
 #include <vector>
 #include <assert.h>
@@ -45,14 +46,18 @@ using namespace std;
 class Solution {
   private:
     string s1, s2;
+    short *dp;
+    int slen;
 
-    inline bool equal(int i1, int j1, int i2, int j2) {
+    inline bool equal(int i1, int i2, int len) {
+      int j1 = i1+len, j2 = i2 + len;
       for (; i1 < j1 && i2 < j2 && s1[i1] == s2[i2]; i1++, i2++);
       return i1 == j1;
     }
 
-    inline bool sameChars(int i1, int j1, int i2, int j2) {
+    inline bool sameChars(int i1, int i2, int len, int dpclen) {
       vector<int> chars(26, 0);
+      int j1 = i1+len, j2 = i2 + len;
 
       for (; i1 < j1 && i2 < j2; i1++, i2++) {
         chars[s1[i1] - 'a']++;
@@ -65,24 +70,34 @@ class Solution {
       return i == 26;
     }
 
-    bool _isScramble(int i1, int j1, int i2, int j2) {
-      int len = j1 - i1;
-      if (0 == len)
-        return true;
-
-      if (equal(i1, j1, i2, j2)) 
-        return true;
-
-      if (!sameChars(i1, j1, i2, j2)) 
+    bool _isScramble(int i1, int i2, int len) {
+      short *dpp = dp + (len-1)*slen*slen+ i1*slen+ i2;
+      if (*dpp == 1)
         return false;
+      if (*dpp == 2)
+        return true;
+
+      if (0 == len)
+        goto succeed;
+
+      if (equal(i1, i2, len)) 
+        goto succeed;
+
+      if (!sameChars(i1, i2, len, dpp - dp))
+        goto failed;
 
       for (int i = 1; i < len; i++) {
-        if ((_isScramble(i1, i1+i, i2, i2+i) && _isScramble(i1+i, j1, i2+i, j2)) || \
-           (_isScramble(i1, i1+i, i2+len-i, j2) && _isScramble(i1+i, j1, i2, i2+len-i)))
-          return true;
+        if ((_isScramble(i1, i2, i) && _isScramble(i1+i, i2+i, len - i)) || \
+           (_isScramble(i1, i2+len-i, i) && _isScramble(i1+i, i2, len-i)))
+          goto succeed;
       }
 
+failed:
+      *dpp = 1;
       return false;
+succeed:
+      *dpp = 2;
+      return true;
     }
 
   public:
@@ -90,7 +105,12 @@ class Solution {
       s1 = str1; s2 = str2;
       if (s1.length() != s2.length())
         return false;
-      return _isScramble(0, s1.length(), 0, s2.length());
+      slen = s1.length();
+      int dplen = slen*slen*slen;
+      dp = (short*)malloc(sizeof(short)*dplen);
+      memset((void *)dp, 0, dplen*sizeof(short));
+
+      return _isScramble(0, 0, slen);
     }
 };
 
