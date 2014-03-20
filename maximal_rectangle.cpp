@@ -31,16 +31,6 @@
 
 using namespace std;
 
-struct Coord {
-  int x;
-  int y;
-  Coord(int i, int j) : x(i), y(j) {}
-
-  int area() {
-    return x*y;
-  }
-};
-
 #define L(i, j) dp[i][j-1]
 #define U(i, j) dp[i-1][j]
 #define LU(i, j) dp[i-1][j-1]
@@ -51,42 +41,16 @@ class Solution {
       int res = 0;
       if (matrix.empty())
         return res;
-      vector<vector<Coord> > dp(matrix.size(), vector<Coord>(matrix[0].size(), Coord(0,0)));
-      if (matrix[0][0] == '1') {
-        dp[0][0].x = dp[0][0].y = 1;
-        res = 1;
-      }
+      vector<vector<int> >  dp(matrix.size(), vector<int>(matrix[0].size(), 0));
 
-      for (int i = 1; i < matrix[0].size(); i++) {
-        if (matrix[0][i] == '1') {
-          dp[0][i].y = 1;
-          dp[0][i].x = L(0, i).x + 1;
-          res = max(res, dp[0][i].area());
-        }
-      }
+      for (int i = 0; i < matrix.size(); i++) {
+        for (int j = 0; j < matrix[i].size(); j++) {
+          if (matrix[i][j] == '1') {
+            dp[i][j] = 1 + (j > 0 ? dp[i][j-1] : 0);
 
-      for (int i = 1; i < matrix.size(); i++) {
-        if (matrix[i][0] == '1') {
-          dp[i][0].x = 1;
-          dp[i][0].y = U(i, 0).y + 1;
-          res = max(res, dp[i][0].area());
-        }
-      }
-
-      for (int i = 1; i < matrix.size(); i++) {
-        for (int j = 1; j < matrix[i].size(); j++) {
-          if (matrix[i][j] == '0') {
-            dp[i][j].x = 0; dp[i][j].y = 0;
-          } else {
-            dp[i][j].x = L(i, j).x + 1;
-            dp[i][j].y = U(i, j).y + 1;
-
-            int w = dp[i][j].x;   /* width */
-            int h = 1;
             int area = 0;
-            for (int ii = i; ii >= 0 && dp[ii][j].x > 0; ii--) {
-              h = i - ii + 1;
-              w = min(w, dp[ii][j].x);
+            for (int ii = i, h = 1, w = dp[i][j]; ii >= 0 && dp[ii][j] > 0; ii--, h++) {
+              w = min(w, dp[ii][j]);
               area = max(area, w*h);
             }
             res = max(area, res);
