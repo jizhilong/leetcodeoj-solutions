@@ -84,7 +84,7 @@ class Solution {
             int w = dp[i][j].x;   /* width */
             int h = 1;
             int area = 0;
-            for (int ii = i; ii >= 0; ii--) {
+            for (int ii = i; ii >= 0 && dp[ii][j].x > 0; ii--) {
               h = i - ii + 1;
               w = min(w, dp[ii][j].x);
               area = max(area, w*h);
