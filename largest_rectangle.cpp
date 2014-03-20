@@ -27,23 +27,26 @@ using namespace std;
 class Solution {
   public:
     int largestRectangleArea(vector<int> &height) {
-      if (height.empty())
+      int len = height.size();
+      if (len == 0)
         return 0;
-      vector<int> mins(height.size(), 0);
-      mins[0] = -1;
+      vector<int> minsl(height.size(), 0);
+      vector<int> minsr(height.size(), 0);
+      minsl[0] = -1;
+      minsr[height.size() - 1] = height.size();
+
       int res = height[0];
-      for (int i = 1; i < height.size(); i++) {
+
+      for (int i = 1; i < len; i++) {
         int j;
-        for (j = i-1; j != -1 && height[j] >= height[i]; j = mins[j]);
-        mins[i] = j;
+        for (j = i-1; j != -1 && height[j] >= height[i]; j = minsl[j]);
+        minsl[i] = j;
+        for (j = len - i; j != len && height[j] >= height[len-1-i]; j = minsr[j]);
+        minsr[len - i - 1] = j;
       }
 
-      for (int i = 1; i < height.size(); i++) {
-        int area = height[i]*(i-mins[i]);
-        for (int j = mins[i]; j != -1; j = mins[j]) {
-          area = max(area, height[j]*(i - mins[j]));
-        }
-        res = max(area, res);
+      for (int i = 1; i < len; i++) {
+        res = max(res, height[i]*(minsr[i]-minsl[i] - 1));
       }
       return res;
     }
