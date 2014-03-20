@@ -34,24 +34,20 @@ class Solution {
           return mid;
         }
 
-        if (target < A[mid]) {
-          if (A[lo] < A[hi]   /* in a normal ascending sequence*/
-              ||target > A[hi] /* target would not be in the right part of the rotated array */
-              ||(A[mid] <= A[lo] && A[mid] < A[mid+1]) /* mid is in the right asecnding part */
-              ) {
+        if (A[lo] < A[mid]) {
+           if (A[lo] <= target && target < A[mid]){ // left part sorted
             hi = mid - 1;
           } else {
             lo = mid + 1;
+          }
+        } else if (A[lo] > A[mid]){
+          if (A[mid] < target && target <= A[hi]){ // right part sorted
+            lo = mid + 1;
+          } else {
+            hi = mid - 1;
           }
         } else {
-          if (A[lo] < A[hi]   /* in a normal ascending sequence */
-              ||(A[mid] > A[hi] && A[mid+1] > A[mid]) /* mid in the left ascending part */
-              ||A[hi] >= target   /* target may only be in the right part of the array*/
-              ) {
-            lo = mid + 1;
-          } else {
-            hi = mid - 1;
-          }
+          lo++;
         }
       }
       return -1;
