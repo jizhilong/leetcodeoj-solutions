@@ -52,7 +52,11 @@ class Solution {
 int
 main()
 {
-  vector<int> histgram = {2,1,5,6,2,3};
+  vector<int> histgram;
+  int tmp;
+  while (cin >> tmp) {
+    histgram.push_back(tmp);
+  }
   Solution solution;
-  assert(solution.largestRectangleArea(histgram) == 10);
+  cout << solution.largestRectangleArea(histgram) << endl;
 }
