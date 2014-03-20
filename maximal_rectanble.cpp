@@ -78,42 +78,22 @@ class Solution {
           if (matrix[i][j] == '0') {
             dp[i][j].x = 0; dp[i][j].y = 0;
           } else {
-            dp[i][j].x = dp[i][j].y = 1;
-            int x , y;
-            x = L(i, j).x + 1; y = min(1+U(i, j).y, L(i, j).y); 
-            if (x * y > dp[i][j].area()) {
-              dp[i][j].x = x;
-              dp[i][j].y = y;
-            }
-            
-            x = min(1+L(i, j).x, U(i, j).x); y = U(i, j).y + 1;
-            if (x * y > dp[i][j].area()) {
-              dp[i][j].x = x;
-              dp[i][j].y = y;
-            }
+            dp[i][j].x = L(i, j).x + 1;
+            dp[i][j].y = U(i, j).y + 1;
 
-            x = min(L(i, j).x, LU(i,j).x) + 1; y = min(U(i, j).y, LU(i, j).y) + 1;
-            if (x * y > dp[i][j].area()) {
-              dp[i][j].x = x;
-              dp[i][j].y = y;
+            int w = dp[i][j].x;   /* width */
+            int h = 1;
+            int area = 0;
+            for (int ii = i; ii >= 0; ii--) {
+              h = i - ii + 1;
+              w = min(w, dp[ii][j].x);
+              area = max(area, w*h);
             }
-
-            if (dp[i][j].area() > res)
-              res = dp[i][j].area();
+            res = max(area, res);
           }
         }
       }
 
-//      for (int i = 0; i < matrix.size(); i++) {
-//        for (int j = 0; j < matrix[i].size(); j++) {
-//          cout << dp[i][j].area() << "  ";
-//        }
-//        cout << endl;
-//      }
-//      for (int i = 0; i < matrix.size(); i++) {
-//        cout << matrix[i] << endl;
-//      }
-//
       return res;
     }
 };
