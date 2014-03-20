@@ -39,14 +39,14 @@ class Solution {
 
       for (int i = 1; i < len; i++) {
         int j;
-        for (j = i-1; j != -1 && height[j] >= height[i]; j = minsl[j]);
+        for (j = i-1; j != -1 && height[j] >= height[i]; j = minsl[j]); /* which is the first left lower bar*/
         minsl[i] = j;
-        for (j = len - i; j != len && height[j] >= height[len-1-i]; j = minsr[j]);
+        for (j = len - i; j != len && height[j] >= height[len-1-i]; j = minsr[j]);  /* which is the first right lower bar */
         minsr[len - i - 1] = j;
       }
 
       for (int i = 1; i < len; i++) {
-        res = max(res, height[i]*(minsr[i]-minsl[i] - 1));
+        res = max(res, height[i]*(minsr[i]-minsl[i] - 1)); /* what is the area with the current bar as the rectangle height */
       }
       return res;
     }
