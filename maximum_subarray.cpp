@@ -30,11 +30,7 @@ class Solution {
       int max , maxe;
       max = maxe = A[0];
       for (int i = 1; i < n; i++) {
-        if (maxe > 0) {
-          maxe += A[i];
-        } else {
-          maxe = A[i];
-        }
+        maxe = A[i] + (maxe > 0 ? maxe : 0);
         max = max > maxe ? max : maxe;
       }
       return max;
