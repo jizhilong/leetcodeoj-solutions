@@ -27,15 +27,19 @@ using namespace std;
 class Solution {
   public:
     void sortColors(int A[], int n) {
-      int colors[] = {0,0,0};
-      for (int i = 0; i < n; i++) {
-        colors[A[i]]++;
-      }
-      int i = 0;
-      for (int k = 0; k < 3; k++) {
-        while (colors[k]) {
-          A[i++] = k;
-          colors[k]--;
+      int i = 0, j = n-1;
+      for (int k = 0; k <= j; k++) {
+        switch (A[k]) {
+          case 0:
+            A[k] = 1;
+            A[i++] = 0;
+            break;
+          case 1:
+            break;
+          case 2:
+            A[k--] = A[j];
+            A[j--] = 2;
+            break;
         }
       }
     }
