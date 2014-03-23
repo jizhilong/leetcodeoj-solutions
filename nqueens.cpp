@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <iostream>
+#include <queue>
 #include <stdlib.h>
 
 using namespace std;
@@ -29,22 +30,36 @@ class Solution {
   private:
     vector<vector<int> > _solveNQueens(int n) {
       vector<vector<int> > res;  /* res[i] is the queen's col index on the row i */
-      if (1 == n) {
-        res.push_back(vector<int>(1, 0));
-        return res;
-      }
-      vector<vector<int> > tail = _solveNQueens(n-1);
+      queue<vector<int> > q;
+      q.push(vector<int>());
+      queue<vector<vector<bool> > > masks;
+      masks.push(vector<vector<bool> >(n, vector<bool>(n, true)));
 
-      for (int i = 0; i < tail.size(); i++) {
+      while (!q.empty()) {
+        vector<int> candidate = q.front(); q.pop();
+        vector<vector<bool> > mask = masks.front(); masks.pop();
+        int len = candidate.size();
+
         for (int j = 0; j < n; j++) {
-          vector<int> prev = tail[i];
-          for (int k = 0; k < n-1; k++) {
-            if (prev[k] >= j) {
-              prev[k]++;
+          if (mask[len][j]) {
+            vector<int> newcandidate = candidate;
+            newcandidate.push_back(j);
+            vector<vector<bool> > newmask = mask;
+            newmask[len][j] = false;
+            if (len < n-1) {
+              for (int k = len; k < n; k++) {
+                newmask[k][j] = false;
+                if (j+k-len < n)
+                  newmask[k][j+k-len] = false;
+                if (j-k+len >= 0)
+                  newmask[k][j-k+len] = false;
+              }
+              q.push(newcandidate);
+              masks.push(newmask);
+            } else {
+              res.push_back(newcandidate);
             }
           }
-          prev.push_back(j);
-          res.push_back(prev);
         }
       }
       return res;
@@ -56,23 +71,11 @@ class Solution {
       vector<vector<int> > resi = _solveNQueens(n);
 
       for (int i = 0; i < resi.size(); i++) {
-        bool fit = true;
-        for (int j = 0; fit && j < n; j++) {
-          for (int k = 0; k < j; k++) {
-            if ((j - k) == abs(resi[i][j] - resi[i][k])) {
-              fit = false;
-              break;
-            }
-          }
-        }
-
-        if (fit) {
         res.push_back(vector<string>(n, string(n, '.')));
         for (int j = 0; j < n; j++) {
           res.back()[j][resi[i][j]] = 'Q';
           }
         }
-      }
 
       return res;
     }
