@@ -32,16 +32,35 @@ class Solution {
       if (height.size() <= 1)
         return 0;
       vector<int> maxl(height.size(), 0);
+      vector<int> maxr(height.size(), height.size()-1);
 
       for (int i = 1; i < height.size(); i++) {
         int j;
-        for (j = 0; j != i && height[j] < height[i]; j++);
+        if (height[i] == height[i-1]) {
+          j = maxl[i-1];
+        } else if (height[i] > height[i-1]) {
+          for (j = maxl[i-1]; j < i && height[j] < height[i]; j++);
+        } else {
+          for (j = 0; j < maxl[i-1] && height[j] < height[i]; j++);
+        }
         maxl[i] = j;
+      }
+
+      for (int i = height.size() - 2; i >= 0; i--) {
+        int j;
+        if (height[i] == height[i+1]) {
+          j = maxr[i+1];
+        } else if (height[i] > height[i+1]) {
+          for (j = maxr[i+1]; j > i && height[j] < height[i]; j--);
+        } else {
+          for (j = height.size() - 1; j > maxr[i+1] && height[j] < height[i]; j--);
+        }
+        maxr[i] = j;
       }
 
       int res = 0;
       for (int i = 0; i < height.size(); i++) {
-         res = max(res, (i - maxl[i])*height[i]);
+         res = max(res, (maxr[i] - maxl[i])*height[i]);
       }
 
       return res;
@@ -52,7 +71,7 @@ class Solution {
 int
 main()
 {
-  vector<int> height = {2,1};
+  vector<int> height = {4,4,2,11,0,11,5,11,13,8};
   Solution solution;
-  assert(solution.maxArea(height) == 1);
+  assert(solution.maxArea(height) == 55);
 }
