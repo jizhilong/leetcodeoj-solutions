@@ -27,30 +27,54 @@ class Solution {
     void setZeroes(vector<vector<int> > &matrix) {
       if (matrix.empty())
         return;
-      vector<bool> rows(matrix.size(), false);
-      vector<bool> cols(matrix[0].size(), false);
+      bool zero1strow = false;
+      bool zero1stcol = false;
+
+      for (int j = 0; j < matrix[0].size(); j++) {
+        if (matrix[0][j] == 0) {
+          zero1strow = true;
+          break;
+        }
+      }
 
       for (int i = 0; i < matrix.size(); i++) {
-        for (int j = 0; j < matrix[i].size(); j++) {
+        if (matrix[i][0] == 0) {
+          zero1stcol = true;
+          break;
+        }
+      }
+
+      for (int i = 1; i < matrix.size(); i++) {
+        for (int j = 1; j < matrix[i].size(); j++) {
           if (matrix[i][j] == 0) {
-            rows[i] = true;
-            cols[j] = true;
+            matrix[0][j] = 0;
+            matrix[i][0] = 0;
           }
         }
       }
 
-      for (int i = 0; i < matrix.size(); i++) {
-        if (rows[i]) {
-          for (int j = 0; j < matrix[i].size(); j++)
+      for (int i = 1; i < matrix.size(); i++) {
+        if (matrix[i][0] == 0) {
+          for (int j = 1; j < matrix[i].size(); j++)
             matrix[i][j] = 0;
         }
       }
 
-      for (int j = 0; j < matrix[0].size(); j++) {
-        if (cols[j]) {
-          for (int i = 0; i < matrix.size(); i++)
+      for (int j = 1; j < matrix[0].size(); j++) {
+        if (matrix[0][j] == 0) {
+          for (int i = 1; i < matrix.size(); i++)
             matrix[i][j] = 0;
         }
+      }
+
+      if (zero1strow) {
+        for (int j = 0; j < matrix[0].size(); j++)
+          matrix[0][j] = 0;
+      }
+
+      if (zero1stcol) {
+        for (int i = 0; i < matrix.size(); i++)
+          matrix[i][0] = 0;
       }
     }
 };
