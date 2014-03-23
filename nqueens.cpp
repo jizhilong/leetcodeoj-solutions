@@ -32,27 +32,28 @@ class Solution {
       vector<vector<int> > res;  /* res[i] is the queen's col index on the row i */
       queue<vector<int> > q;
       q.push(vector<int>());
-      queue<int> maskls, maskrs, masks;
-      maskls.push(0); maskrs.push(0); masks.push(0);
+      queue<int> maskdls, maskdrs, masks;
+      maskdls.push(0); maskdrs.push(0); masks.push(0);
 
       while (!q.empty()) {
         vector<int> candidate = q.front(); q.pop();
-        int maskl = maskls.front(); maskls.pop();
-        int maskr = maskrs.front(); maskrs.pop();
+        int maskdl = maskdls.front(); maskdls.pop();
+        int maskdr = maskdrs.front(); maskdrs.pop();
         int mask = masks.front(); masks.pop();
         int len = candidate.size();
 
         for (int j = 0; j < n; j++) {
           int m = 1 << j;
-          int mm = mask | maskl | maskr;
-          if (mm ^ (mm | m)) {
+          int mdl = 1 << (len + j);
+          int mdr = 1 << (n-1-j+len);
+          if (((mask | m)^ mask) && ((maskdl | mdl) ^ maskdl) && ((maskdr | mdr) ^ maskdr)) {
             vector<int> newcandidate = candidate;
             newcandidate.push_back(j);
             if (len < n-1) {
               q.push(newcandidate);
               masks.push(mask | m);
-              maskls.push(maskl >> 1 | (j > 0 ? 1 << (j-1) : 0));
-              maskrs.push(maskr << 1 | (j < n-1 ? 1 << (j+1) : 0));
+              maskdls.push(maskdl | mdl);
+              maskdrs.push(maskdr | mdr);
             } else {
               res.push_back(newcandidate);
             }
