@@ -23,8 +23,6 @@
  */
 
 #include <iostream>
-#include <queue>
-#include <vector>
 #include <assert.h>
 
 using namespace std;
@@ -32,28 +30,11 @@ using namespace std;
 class Solution {
   public:
     bool canJump(int A[], int n) {
-      if (n <= 1)
-        return true;
-      queue<int> q;
-      vector<bool> mark(n, false);
-      q.push(n-1);
-      mark[n-1] = true;
-
-      while (!q.empty()) {
-        int i = q.front(); q.pop();
-
-        if (i == 0) {
-          return true;
-        }
-
-        for (int j = i-1; j >= 0; j--) {
-          if (j+A[j] >= i && !mark[j]) {
-            mark[j] = true;
-            q.push(j);
-          }
-        }
+      int canReach = 0;
+      for (int i = 0; i < n && i <= canReach; i++) {
+        if (i+A[i] > canReach) canReach = i+ A[i];
+        if (canReach >= n-1) return true;
       }
-
       return false;
     }
 };
