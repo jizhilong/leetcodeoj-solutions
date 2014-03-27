@@ -23,8 +23,6 @@
  */
 
 #include <iostream>
-#include <vector>
-#include <queue>
 #include <algorithm>
 
 using namespace std;
@@ -32,28 +30,18 @@ using namespace std;
 class Solution {
   public:
     int jump(int A[], int len) {
-      if (len <= 1)
-        return 0;
-      vector<bool> mark(len, false);
-      queue<int> q;
-      queue<int> steps;
-      q.push(0); steps.push(0); mark[0] = true;
+      int res = 0;  /* result */
+      int last = 0; /* maximum index can be reached within res steps */
+      int curr = 0; /* maximum index can be reached within res+1 steps */
 
-      while (!q.empty()) {
-        int i = q.front(); q.pop();
-        int step = steps.front(); steps.pop();
-
-        if (i + A[i] >= len-1)
-          return step+1;
-        for (int j = i+A[i]; j > i; j--) {
-          if (!mark[j]) {
-            q.push(j);
-            steps.push(step+1);
-            mark[j] = true;
-          }
+      for (int i = 0; i < len; i++) {
+        if (i > last) {
+          last = curr;
+          res++;
         }
+        curr = max(curr, i+A[i]);
       }
-      return -1;
+      return res;
     }
 };
 
