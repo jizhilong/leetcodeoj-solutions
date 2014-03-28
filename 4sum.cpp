@@ -30,16 +30,11 @@ using namespace std;
 class Solution {
   private:
     vector<vector<int> > dp;
+
     vector<vector<int> > kSum(vector<int> &num, int s, int k, int target) {
       vector<vector<int> > res;
       if (k > num.size() - s)
         return res;
-
-      if (k == 0) {
-        if (target == 0)
-          res.push_back(vector<int>());
-        return res;
-      }
 
       if (target < dp[s][k-1] || target > dp[num.size() - k][k-1]) {
         return res;
@@ -58,12 +53,16 @@ class Solution {
             hi = mid-1;
           }
         }
+        return res;
       }
 
       int j;
       for (j = s+1; j < num.size() && num[j] == num[s]; j++);
+      int bound = min(k-1, j-s);
+      if (k <= j-s && num[s]*k == target)
+        res.push_back(vector<int>(k, num[s]));
 
-      for (int n = 0; n <= k && n <= j-s; n++) {
+      for (int n = 0; n <= bound; n++) {
         vector<vector<int> > tail = kSum(num, j, k - n, target-n*num[s]);
         for (int m = 0; m < tail.size(); m++) {
           vector<int> tmp = tail[m];
