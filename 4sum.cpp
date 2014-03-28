@@ -29,6 +29,7 @@ using namespace std;
 
 class Solution {
   private:
+    vector<vector<int> > dp;
     vector<vector<int> > kSum(vector<int> &num, int s, int k, int target) {
       vector<vector<int> > res;
       if (k > num.size() - s)
@@ -40,13 +41,12 @@ class Solution {
         return res;
       }
 
-
-      if (target < num[s]*k || target > num.back()*k) {
+      if (target < dp[s][k-1] || target > dp[num.size() - k][k-1]) {
         return res;
       }
 
       if (k == 1) {
-        int lo = s, hi = num.size();
+        int lo = s, hi = num.size() - 1;
         while (lo <= hi) {
           int mid = (lo+hi)/2;
           if (num[mid] == target) {
@@ -79,6 +79,20 @@ class Solution {
   public:
     vector<vector<int> > fourSum(vector<int> &num, int target) {
       sort(num.begin(), num.end());
+      int len = num.size();
+
+      if (len < 4)
+        return vector<vector<int> >();
+
+      dp = vector<vector<int> >(len, vector<int>(4,0));
+
+      for (int i = len - 1; i >= 0; i--) {
+        dp[i][0] = num[i];
+        for (int j = 2; j <= 4 && j <= len - i; j++) {
+          dp[i][j-1] = dp[i+1][j-2] + num[i];
+        }
+      }
+
       return kSum(num, 0, 4, target);
     }
 };
