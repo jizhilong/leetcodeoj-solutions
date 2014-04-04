@@ -34,25 +34,22 @@ class Solution {
 public:
     vector<Interval> insert(vector<Interval> &intervals, Interval newInterval) {
       vector<Interval> ret;
-      int i;
-      for (i = 0; i < intervals.size() && intervals[i].start < newInterval.start; i++) {
-        ret.push_back(intervals[i]);
-      }
-
-      if (ret.empty() || newInterval.start > ret.back().end) {
+      if (intervals.empty()) {
         ret.push_back(newInterval);
-      } else {
-        ret.back().end = max(ret.back().end, newInterval.end);
+        return ret;
       }
+      int e;
+      for (e = intervals.size() - 1; e >= 0 && intervals[e].start > newInterval.end; e--);
+      if (e >= 0)
+        newInterval.end = max(newInterval.end, intervals[e].end);
+      int s;
+      for (s = 0; s <= e && intervals[s].end < newInterval.start; s++);
+      if (s <= e)
+        newInterval.start = min(newInterval.start, intervals[s].start);
 
-      for (i; i < intervals.size(); i++) {
-        if (intervals[i].start > ret.back().end) {
-          ret.push_back(intervals[i]);
-        } else {
-          ret.back().end = max(ret.back().end, intervals[i].end);
-        }
-      }
-
+      ret.insert(ret.begin(), intervals.begin(), intervals.begin() + s);
+      ret.push_back(newInterval);
+      ret.insert(ret.end(), intervals.begin() + e + 1, intervals.end());
       return ret;
     }
 };
@@ -62,9 +59,9 @@ int
 main()
 {
 
-  vector<Interval> intervals = {Interval(1,3),Interval(6,9)};
+  vector<Interval> intervals = {Interval(1,5)};
   Solution solution;
-  vector<Interval> res = solution.insert(intervals, Interval(2, 5));
+  vector<Interval> res = solution.insert(intervals, Interval(6, 8));
   for (int i = 0; i < res.size(); i++) {
     cout << "[" << res[i].start << "," << res[i].end << "]" <<endl;
   }
