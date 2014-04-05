@@ -27,12 +27,9 @@ class Solution {
   public:
     bool isMatch(const char *s, const char *p) {
       int lens = strlen(s), lenp = strlen(p);
-      if (lens == 0) {
-        return lenp == 0;
-      }
-      if (lenp == 0) {
-        return lens == 0;
-      }
+
+      if (p[lenp - 1] != '*' && p[lenp-1] != '.' && s[lens-1] != p[lenp-1])
+        return false;
 
       stack<int> qs;
       stack<int> qp;
@@ -64,6 +61,10 @@ class Solution {
             if (si < lens) {
               qs.push(si+1);
               qp.push(pi+1);
+            }
+            if (pi+1 < lenp && p[pi+1] == '*') {
+              qs.push(si);
+              qp.push(pi+2);
             }
             break;
           default:
@@ -97,4 +98,6 @@ main()
   assert(solution.isMatch("a", "ab*"));
   assert(solution.isMatch("aa", "a*c*a"));
   assert(solution.isMatch("aaaaaaaaaaaaab", "a*a*a*a*a*a*a*a*a*a*a*a*b"));
+  assert(!solution.isMatch("aaaaaaaaaaaaab", "a*a*a*a*a*a*a*a*a*a*c"));
+  assert(solution.isMatch("", ".*"));
 }
