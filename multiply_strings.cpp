@@ -27,36 +27,14 @@ using namespace std;
 
 
 class Solution {
-  private:
-
-
-    inline void shift(string &num, int n) {
-      for (int i = 0; i < n; i++) {
-        num.push_back('0');
-      }
-    }
-
-    bool allzero(string str) {
-      for (int i = 0; i < str.size(); i++) {
-        if (str[i] != '0')
-          return false;
-      }
-      return true;
-    }
-
   public:
     string add(string str1, string str2) {
       stringstream ss;
       int inc = 0;
       int e1 = str1.length()-1, e2 = str2.length()-1;
       while (e1 >= 0 || e2 >= 0) {
-        if (e1 >= 0) {
-          inc += str1[e1--] - '0';
-        }
-
-        if (e2 >= 0) {
-          inc += str2[e2--] - '0';
-        }
+        inc += e1 >= 0 ? str1[e1--] - '0' : 0;
+        inc += e2 >= 0 ? str2[e2--] - '0' : 0;
         ss << (inc % 10);
         inc /= 10;
       }
@@ -107,11 +85,13 @@ class Solution {
       int len1 = num1.length();
       int len2 = num2.length();
 
-      if (len1 == 0 || len2 == 0 || allzero(num1) || allzero(num2)) 
-        return "0";
-
       if (len1 < len2)
         return multiply(num2, num1);
+
+      if (len1 == 0 || len2 == 0 || 
+          all_of(num1.begin(), num1.end(), [](char c){ return c == '0'; }) ||
+          all_of(num2.begin(), num2.end(), [](char c){ return c == '0'; })) 
+        return "0";
 
       if (len1+len2 < 10) {
         int n1 = stoi(num1), n2 = stoi(num2);
@@ -137,8 +117,8 @@ class Solution {
       string B = multiply(x2, y2);
       string C = multiply(add(x1,x2), add(y1,y2));
       string K = sub(C, add(A,B));
-      shift(A, 2*rlen);
-      shift(K, rlen);
+      A.append(string(2*rlen, '0'));
+      K.append(string(rlen, '0'));
 
       return add(A, add(B, K));
     }
