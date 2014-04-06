@@ -23,10 +23,12 @@ using namespace std;
 class Solution {
   private:
     bool matchStar(char c, const char *s, const char *p) {
+      const char *t;
+      for (t = s; *t != '\0' && (*t == c || c == '.'); t++);
       do {
-        if (isMatch(s, p))
+        if (isMatch(t, p))
           return true;
-      } while (*s != '\0' && (*s++ == c || c == '.'));
+      } while (t-- > s);
       return false;
     }
 
@@ -36,6 +38,8 @@ class Solution {
         return s[0] == '\0';
       if (p[1] == '*')
         return matchStar(p[0], s, p+2);
+      if (p[1] == '+')
+        return (s[0] == p[0] || p[0] == '.') && matchStar(p[0], s+1, p+2);
       if (p[0] == '$' && p[1] == '\0')
         return *s == '\0';
       if (s[0] != '\0' && (p[0] == '.' || p[0] == s[0]))
@@ -61,4 +65,6 @@ main()
   assert(!solution.isMatch("aaaaaaaaaaaaab", "a*a*a*a*a*a*a*a*a*a*c"));
   assert(solution.isMatch("", ".*"));
   assert(!solution.isMatch("", "b"));
+  assert(solution.isMatch("bca", "b+a*c*a$"));
+  assert(!solution.isMatch("ca", "b+a*c*a$"));
 }
