@@ -16,89 +16,83 @@
  * =====================================================================================
  */
 
-#include <vector>
+
 #include <iostream>
+#include <vector>
+#include <assert.h>
 #include <algorithm>
 
 using namespace std;
 
-class Solution {
-private:
-    int bin_search(vector<int> &num, int target, int lo) {
-      int hi = num.size() - 1;
-      int mid;
-      int m;
-
-      while (lo <= hi) {
-        mid = lo + ((hi - lo) >> 1);
-        m = num[mid];
-
-        if (target == m) {
-          return mid;
-        } else if (target < m) {
-          hi = mid - 1;
-        } else {
-          lo = mid + 1;
-        }
-      }
-
-      return -1;
-    }
-
-    vector<vector<int> > twoSum(vector<int> &num, int target, int lo) {
-      vector<vector<int> > ret;
-
-      for (int i = lo; i < num.size();) {
-        int j;
-        int m;
-        for (j = i+1; j < num.size() && num[j] == num[i]; j++);
-        if (j - i >= 2 && 2*num[i] == target) {
-          ret.push_back(vector<int>(2, num[i]));
-        }
-        if ((m = bin_search(num, target - num[i], j)) != -1) {
-          ret.push_back(vector<int>());
-          ret.back().push_back(num[i]);
-          ret.back().push_back(num[m]);
-        } 
-        i = j;
-      }
-      return ret;
-    }
-
-public:
-
-    vector<vector<int> > threeSum(vector<int> &num) {
-      sort(num.begin(), num.end());
-      vector<vector<int> > ret;
-
-      for (int i = 0; i < num.size();) {
-        int j;
-        for (j = i+1; j < num.size() && num[j] == num[i]; j++);
-
-        if (j-i >= 3 && num[i] == 0) {
-          ret.push_back(vector<int>(3, 0));
-        }
-
-        if (j-i >= 2) {
-          int m;
-          if ((m = bin_search(num, -2*num[i], j)) != -1) {
-            ret.push_back(vector<int>(2, num[i]));
-            ret.back().push_back(num[m]);
-          }
-        }
-
-        vector<vector<int> > tmp = twoSum(num, -num[i], j);
-        for (int k = 0; k < tmp.size(); k++) {
-          ret.push_back(tmp[k]);
-          ret.back().insert(ret.back().begin(), num[i]);
-        }
-        i = j;
-      }
-
-      return ret;
-    }
+struct LN {
+  int val;
+  LN *next;
+  LN(int x) : val(x), next(NULL) {};
 };
 
+class Solution {
+  private:
+    vector<vector<int> > dp;
+    vector<vector<int> > res;
+
+    void kSum(vector<int> &num, int s, int k, int target, LN *prev) {
+
+      if (k > num.size() - s)
+        return;
+
+      if (k == 1) {
+        int lo = s, hi = num.size() - 1;
+        while (lo <= hi) {
+          int mid = (lo+hi)/2;
+          if (num[mid] == target) {
+            vector<int> restmp(1,target);
+            LN *tmp = prev;
+            for (LN *tmp = prev; tmp; tmp = tmp->next)
+              restmp.push_back(tmp->val);
+            reverse(restmp.begin(), restmp.end());
+            res.push_back(restmp);
+            break;
+          } else if (num[mid] < target) {
+            lo = mid+1;
+          } else {
+            hi = mid-1;
+          }
+        }
+        return;
+      }
+
+      int j;
+      for (j = s+1; j < num.size() && num[j] == num[s]; j++);
+      int bound = min(k-1, j-s);
+
+      if (k <= j-s && num[s]*k == target) {
+        vector<int> restmp(k, num[s]);
+        LN *tmp = prev;
+        for (LN *tmp = prev; tmp; tmp = tmp->next)
+          restmp.push_back(tmp->val);
+        reverse(restmp.begin(), restmp.end());
+        res.push_back(restmp);
+      }
+        
+      for (int n = 0; n <= bound; n++) {
+        LN *tail = prev;
+        for (int h = 0; h < n; h++) {
+          LN *node = new LN(num[s]);
+          node->next = tail;
+          tail = node;
+        }
+        kSum(num, j, k - n, target-n*num[s], tail);
+      }
+    }
+
+  public:
+    vector<vector<int> > threeSum(vector<int> &num) {
+      sort(num.begin(), num.end());
+
+      kSum(num, 0, 3, 0, NULL);
+      return res;
+    }
+};
 
 int
 main(int argc, char *argv[])
