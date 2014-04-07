@@ -52,6 +52,13 @@ public:
 
   virtual char getChar() {
   }
+
+  virtual void addState(vector<State *> &list, int listid) {
+    if (lastlist == listid)
+      return;
+     lastlist = listid;
+     list.push_back(this);
+  }
 };
 
 class Dot : public State {
@@ -91,6 +98,14 @@ public:
 
   virtual char getChar() {
     return '@';
+  }
+
+  virtual void addState(vector<State *> &list, int listid) {
+    if (lastlist == listid)
+      return;
+    for (int i = 0; i < outs.size(); i++) {
+      outs[i]->addState(list, listid);
+    }
   }
 };
 
@@ -169,22 +184,18 @@ class RE {
     bool match(const char *s) {
       vector<vector<State *> > cache(2, vector<State *>());
       int id = 0;
-      cache[id].push_back(start);
-      for (const char *t = s; t == s || *(t-1) != '\0'; t++) {
+      int listid = 0;
+      start->outs[0]->addState(cache[id], listid);
+      listid++;
+      for (const char *t = s; *t != '\0'; t++, listid++) {
         int newid = id ^ 1;
         cache[newid].clear();
 
-        cout << *t << " " << cache[id].size() << endl;
         for (int i = 0; i < cache[id].size(); i++) {
           State *state = cache[id][i];
-          for (int j = 0; j < state->outs.size(); j++) {
-            State *out = state->outs[j];
-            if (out->accept(*t)) {
-              if (out->lastlist != newid) {
-                cache[newid].push_back(out);
-                out->lastlist = newid;
-              }
-            }
+          if (state->accept(*t)) {
+            for (int j = 0; j < state->outs.size(); j++)
+              state->outs[j]->addState(cache[newid], listid);
           }
         }
         id = newid;
@@ -196,11 +207,6 @@ class RE {
       }
 
       return false;
-  }
-
-  void printChars() {
-    for (State *s = start; !s->outs.empty(); s = s->outs[0])
-      cout << s->outs[0]->getChar() << endl;
   }
 };
 
@@ -217,9 +223,9 @@ int
 main()
 {
   Solution solution;
-//  assert(!solution.isMatch("aa", "a"));
-//  assert(solution.isMatch("aa", "aa"));
-//  assert(!solution.isMatch("aaa", "a"));
+  assert(!solution.isMatch("aa", "a"));
+  assert(solution.isMatch("aa", "aa"));
+  assert(!solution.isMatch("aaa", "a"));
   assert(solution.isMatch("aa", "a*"));
   assert(solution.isMatch("aa", ".*"));
   assert(solution.isMatch("ab", ".*"));
