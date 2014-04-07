@@ -26,31 +26,27 @@ using namespace std;
 
 class State {
 protected:
-public:
   int lastlist;
-  vector<State *> outs;
+public:
+  State *out;
 
   State() {
     lastlist = -1;
   }
 
   virtual bool accept(char c) {
-    return true;
+    return false;
   }
 
   virtual void setOut(State *node) {
-    outs.push_back(node);
+    out = node;
+  }
+
+  virtual void setOut(State *node, State *node1) {
   }
 
   virtual bool isMatch() {
     return false;
-  }
-
-  virtual void clearOuts() {
-    outs.clear();
-  }
-
-  virtual char getChar() {
   }
 
   virtual void addState(vector<State *> &list, int listid) {
@@ -63,8 +59,8 @@ public:
 
 class Dot : public State {
 public:
-  virtual char getChar() {
-    return '.';
+  virtual bool accept(char c) {
+    return true;
   }
 };
 
@@ -78,45 +74,33 @@ public:
   virtual bool accept(char c) {
     return c == ch;
   }
-  virtual char getChar() {
-    return ch;
-  }
 };
 
-class Start : public Dot {
-public:
-  virtual char getChar() {
-    return '^';
-  }
+class Start : public State {
 };
 
-class Split : public Dot {
+class Split : public State {
 public:
+  State *out1;
   Split (State *node) {
-    outs.push_back(node);
+    out = node;
   }
 
-  virtual char getChar() {
-    return '@';
+  virtual void setOut(State *node) {
+    out1 = node;
   }
-
   virtual void addState(vector<State *> &list, int listid) {
     if (lastlist == listid)
       return;
-    for (int i = 0; i < outs.size(); i++) {
-      outs[i]->addState(list, listid);
-    }
+   out->addState(list, listid);
+   out1->addState(list, listid);
   }
 };
 
-class Match : public Dot {
+class Match : public State {
 public:
   virtual bool isMatch() {
     return true;
-  }
-
-  virtual char getChar() {
-    return '$';
   }
 };
 
@@ -132,70 +116,74 @@ class RE {
       compile(p);
     }
 
-    void compile(const char *p) {
-      start->clearOuts();
+    void compile(const char *s) {
       stack<vector<State *> > stk;
       stk.push(vector<State *>(1, start));
 
+#define fix_hanglings(node, tail)  for_each (hanglings.begin(), hanglings.end(), [node](State *s){ s->setOut(node);});\
+                                  hanglings.clear();\
+                                  hanglings.push_back(tail);\
+                                  stk.push(hanglings);
+      const char *p = s;
+
       while (*p != '\0') {
         vector<State *> hanglings = stk.top(); stk.pop();
+        State *node, *tmp;
         switch (p[1]) {
           case '*':
-            {
-              State *node = p[0] == '.' ? (State *)new Dot() : (State *)new Normal(p[0]);
-              State *split = new Split(node);
-              node->outs.push_back(split);
-              for_each (hanglings.begin(), hanglings.end(), [split](State *s){ s->setOut(split);});
-              hanglings.clear();
-              hanglings.push_back(split);
+            if ((p >= s+2) && 
+                ((*(p-2) == '.' || *(p-2) == *p) && 
+                 (*(p-1) == '*' || *(p-1) == '+'))) {
               stk.push(hanglings);
-              p += 2;
+            } else {
+              tmp = p[0] == '.' ? (State *)new Dot() : (State *)new Normal(p[0]);
+              node= new Split(tmp);
+              tmp->setOut(node);
+              fix_hanglings(node, node);
             }
+            p += 2;
+            break;
+          case '+':
+            tmp = p[0] == '.' ? (State *)new Dot() : (State *)new Normal(p[0]);
+            node= new Split(tmp);
+            tmp->setOut(node);
+            fix_hanglings(tmp, node);
+            p += 2;
             break;
           default:
             switch (p[0]) {
               case '.':
-                {
-                  State *dot = (State *)new Dot();
-                  for_each (hanglings.begin(), hanglings.end(), [dot](State *s){ s->setOut(dot);});
-                  hanglings.clear();
-                  hanglings.push_back(dot);
-                  stk.push(hanglings);
-                  p++;
-                }
+                node = (State *)new Dot();
+                fix_hanglings(node, node);
+                p++;
                 break;
               default:
-                {
-                  State *normal = (State *)new Normal(p[0]);
-                  for_each (hanglings.begin(), hanglings.end(), [normal](State *s){ s->setOut(normal);});
-                  hanglings.clear();
-                  hanglings.push_back(normal);
-                  stk.push(hanglings);
-                  p++;
-                }
+                node = (State *)new Normal(p[0]);
+                fix_hanglings(node, node);
+                p++;
                 break;
             }
         }
       }
+#undef fix_hanglings
       vector<State *> hanglings = stk.top(); stk.pop();
       for_each (hanglings.begin(), hanglings.end(), [this](State *s){ s->setOut(this->end);});
+      start = start->out;
     }
 
     bool match(const char *s) {
       vector<vector<State *> > cache(2, vector<State *>());
       int id = 0;
-      int listid = 0;
-      start->outs[0]->addState(cache[id], listid);
-      listid++;
+      int listid = 1;
+      start->addState(cache[id], 0);
       for (const char *t = s; *t != '\0'; t++, listid++) {
         int newid = id ^ 1;
         cache[newid].clear();
 
         for (int i = 0; i < cache[id].size(); i++) {
           State *state = cache[id][i];
-          if (state->accept(*t)) {
-            for (int j = 0; j < state->outs.size(); j++)
-              state->outs[j]->addState(cache[newid], listid);
+          if (state->accept(*t) && state->out) {
+            state->out->addState(cache[newid], listid);
           }
         }
         id = newid;
@@ -232,11 +220,11 @@ main()
   assert(solution.isMatch("aab", "c*a*b"));
   assert(solution.isMatch("a", "ab*"));
   assert(solution.isMatch("aa", "a*c*a"));
-  assert(solution.isMatch("aaaaaaaaaaaaab", "a*a*a*a*a*a*a*a*a*a*a*a*b"));
+  assert(solution.isMatch("aaaaaaaaaaaaab", "a*a*b"));
   assert(!solution.isMatch("aaaaaaaaaaaaab", "a*a*a*a*a*a*a*a*a*a*c"));
   assert(solution.isMatch("", ".*"));
   assert(!solution.isMatch("", "b"));
-//  assert(solution.isMatch("bca", "b+a*c*a$"));
-//  assert(!solution.isMatch("ca", "b+a*c*a$"));
+  assert(solution.isMatch("bca", "b+a*c*a"));
+  assert(!solution.isMatch("ca", "b+a*c*a"));
   assert(!solution.isMatch("", "."));
 }
