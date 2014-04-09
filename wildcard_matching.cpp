@@ -36,32 +36,33 @@ class Solution {
 		return *s == *p;
 	  }
 
+	  vector<int> dp;
+	  dp.push_back(0);
+
 	  for (int i = 0; i < lenp; i++) {
-		if (min > lens)
+		vector<int> tmp;
+		if (dp.empty()) {
 		  return false;
-		if (p[i] == '*') {
-		  max = lens;
-		} else if (p[i] == '?') {
-		  min++;
-		  if (max < min)
-			max = min;
-		} else {
-		  while (min <= max && s[min] != p[i])
-			min++;
-		  if (s[min] == p[i])
-			min++;
-		  else
-			return false;
-		  while (max >= min && s[max] != p[i])
-			max--;
-		  if (s[max] == p[i])
-			max++;
-		  else
-			return false;
 		}
+
+		if (p[i] == '*') {
+		  for (int j = dp[0]-1; j < lens; j++) {
+			tmp.push_back(j+1);
+		  }
+		} else if (p[i] == '?') {
+		  for (int j = 0; j < dp.size() && dp[j] < lens; j++) {
+			tmp.push_back(dp[j]+1);
+		  }
+		} else {
+		  for (int j = 0; j < dp.size() && dp[j] < lens; j++) {
+			if (p[i] == s[dp[j]])
+			  tmp.push_back(dp[j]+1);
+		  }
+		}
+		dp.swap(tmp);
 	  }
 
-	  return max == lens;
+	  return !dp.empty() && dp.back() == lens;
     }
 };
 
@@ -70,9 +71,10 @@ int
 main()
 {
   Solution solution;
-  assert(!solution.isMatch("aa", "a"));
-  assert(!solution.isMatch("ac", "*ab"));
-  assert(solution.isMatch("aa", "aa"));
+//  assert(!solution.isMatch("aa", "a"));
+//  assert(!solution.isMatch("ac", "*ab"));
+//  assert(solution.isMatch("aa", "aa"));
+  assert(!solution.isMatch("aba", "*aa"));
   assert(!solution.isMatch("aaa", "aa"));
   assert(solution.isMatch("aa", "*"));
   assert(solution.isMatch("aa", "a*"));
