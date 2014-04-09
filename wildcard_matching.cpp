@@ -18,7 +18,6 @@
 
 #include <assert.h>
 #include <vector>
-#include <algorithm>
 #include <iostream>
 #include <cstring>
 
@@ -28,49 +27,45 @@ using namespace std;
 class Solution {
   public:
     bool isMatch(const char *s, const char *p) {
-	  int min = 0, max = 0;
+      int lens = strlen(s);
 	  vector<char> pp;
-	  int nonstarts = 0;
+	  int rightmost = lens;
 	  for (p; *p != '\0'; p++) {
 		if (*p == '*') {
 		  if (pp.empty() || pp.back() != '*')
 			pp.push_back('*');
 		} else {
 		  pp.push_back(*p);
-		  nonstarts++;
+          rightmost--;
 		}
 	  }
 
-	  int lens = strlen(s), lenp = pp.size();
+	  int lenp = pp.size();
 	  if (lens == 0)
-		return nonstarts == 0;
-	  if (nonstarts > lens)
+		return rightmost == 0;
+	  if (rightmost < 0)
 		return false;
 
 	  vector<int> dp;
 	  dp.push_back(0);
 
 	  for (int i = 0; i < lenp; i++) {
-		vector<int> tmp;
 		if (dp.empty()) {
 		  return false;
 		}
 
+		vector<int> tmp;
+
 		if (pp[i] == '*') {
-		  for (int j = dp[0]; j <= lens - nonstarts; j++) {
+		  for (int j = dp[0]; j <= rightmost; j++) {
 			tmp.push_back(j);
 		  }
-		} else if (pp[i] == '?') {
-		  nonstarts--;
-		  for (int j = 0; j < dp.size() && dp[j]+1 <= lens - nonstarts; j++) {
-			tmp.push_back(dp[j]+1);
-		  }
 		} else {
-		  nonstarts--;
-		  for (int j = 0; j < dp.size() && dp[j]+1 <= lens - nonstarts; j++) {
-			if (pp[i] == s[dp[j]])
+		  for (int j = 0; j < dp.size() && dp[j] <= rightmost; j++) {
+			if (pp[i] == '?' || pp[i] == s[dp[j]])
 			  tmp.push_back(dp[j]+1);
 		  }
+          rightmost++;
 		}
 		dp.swap(tmp);
 	  }
