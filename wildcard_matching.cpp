@@ -29,12 +29,23 @@ class Solution {
   public:
     bool isMatch(const char *s, const char *p) {
 	  int min = 0, max = 0;
-	  int lens = strlen(s), lenp = strlen(p);
-	  if (lens == 0 || lenp == 0) {
-		while (*p == '*')
-		  p++;
-		return *s == *p;
+	  vector<char> pp;
+	  int nonstarts = 0;
+	  for (p; *p != '\0'; p++) {
+		if (*p == '*') {
+		  if (pp.empty() || pp.back() != '*')
+			pp.push_back('*');
+		} else {
+		  pp.push_back(*p);
+		  nonstarts++;
+		}
 	  }
+
+	  int lens = strlen(s), lenp = pp.size();
+	  if (lens == 0)
+		return nonstarts == 0;
+	  if (nonstarts > lens)
+		return false;
 
 	  vector<int> dp;
 	  dp.push_back(0);
@@ -45,17 +56,19 @@ class Solution {
 		  return false;
 		}
 
-		if (p[i] == '*') {
-		  for (int j = dp[0]-1; j < lens; j++) {
-			tmp.push_back(j+1);
+		if (pp[i] == '*') {
+		  for (int j = dp[0]; j <= lens - nonstarts; j++) {
+			tmp.push_back(j);
 		  }
-		} else if (p[i] == '?') {
-		  for (int j = 0; j < dp.size() && dp[j] < lens; j++) {
+		} else if (pp[i] == '?') {
+		  nonstarts--;
+		  for (int j = 0; j < dp.size() && dp[j]+1 <= lens - nonstarts; j++) {
 			tmp.push_back(dp[j]+1);
 		  }
 		} else {
-		  for (int j = 0; j < dp.size() && dp[j] < lens; j++) {
-			if (p[i] == s[dp[j]])
+		  nonstarts--;
+		  for (int j = 0; j < dp.size() && dp[j]+1 <= lens - nonstarts; j++) {
+			if (pp[i] == s[dp[j]])
 			  tmp.push_back(dp[j]+1);
 		  }
 		}
@@ -68,12 +81,14 @@ class Solution {
 
 
 int
-main()
+main(int argc, char *argv[])
 {
   Solution solution;
-//  assert(!solution.isMatch("aa", "a"));
-//  assert(!solution.isMatch("ac", "*ab"));
-//  assert(solution.isMatch("aa", "aa"));
+  if (argc >= 3)
+	cout << solution.isMatch(argv[1], argv[2]) << endl;
+  assert(!solution.isMatch("aa", "a"));
+  assert(!solution.isMatch("ac", "*ab"));
+  assert(solution.isMatch("aa", "aa"));
   assert(!solution.isMatch("aba", "*aa"));
   assert(!solution.isMatch("aaa", "aa"));
   assert(solution.isMatch("aa", "*"));
