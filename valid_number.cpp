@@ -28,29 +28,17 @@
 using namespace std;
 
 class Solution {
-  private:
-    const char *getInt(const char *s) {
-      while (isdigit(*s)) s++;
-      return s;
-    }
-
   public:
     bool isNumber(const char *s) {
       while (isblank(*s)) s++;
       if (*s == '+' || *s == '-')
         s++;
-      if (*s == '\0')
-        return false;
       if (*s != '.' && !isdigit(*s))
         return false;
       if (*s == '.' && !isdigit(*(s+1)))
         return false;
 
-      if (isdigit(*s)) {
-        s = getInt(s);
-        if (s == NULL)
-          return false;
-      }
+      while (isdigit(*s)) s++;
 
       if (*s == '.') {
         s++;
@@ -63,11 +51,8 @@ class Solution {
           s++;
         if (!isdigit(*s))
           return false;
-        s = getInt(s);
+        while (isdigit(*s)) s++;
       }
-
-      if (!s)
-        return false;
 
       while (isblank(*s)) s++;
       return *s == '\0';
