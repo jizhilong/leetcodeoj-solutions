@@ -38,42 +38,42 @@ int bsearch(int *A, int n, int t) {
 }
 
 int findKth(int *A, int m, int *B, int n, int k) {
-  if (m == 0)
-    return B[k];
-  if (n == 0)
-    return A[k];
-
-  if (A[0] == B[0]) {
-    if (k <= 1)
-      return A[0];
-    else
-      return findKth(A+1, m-1, B+1, n-1, k-2);
-  }
-
-  if (A[m-1] <= B[0]) { /* [A1,A2...Am,B1,B2...Bn] */
-    if (k < m)
-      return A[k];
-    else
-      return B[k-m];
-  }
-
-  if (B[n-1] <= A[0]) { /* [B1,B2...Bn,A1,A2...Am] */
-    if (k < n)
+  while (true) {
+    if (m == 0)
       return B[k];
-    else
-      return A[k-n];
-  }
-
-  if (B[0] >= A[0]) {  /* [A1,A2..A[h-1]...B1....Am..Bn] */
-    int h = bsearch(A, m, B[0]);
-    if (h > k || (h==k && A[h] == B[0]))
+    if (n == 0)
       return A[k];
-    return findKth(A+h, m-h, B, n, k-h);
-  } else {
-    int h = bsearch(B, n, A[0]);
-    if (h > k || (h==k && B[h] == A[0]))
-      return B[k];
-    return findKth(A, m, B+h, n-h, k-h);
+    if (A[0] == B[0]) {
+      if (k <= 1)
+        return A[0];
+      else {
+        A++;m--;B++;n--;k-=2;
+      }
+    }
+
+    if (A[m-1] <= B[0]) { /* [A1,A2...Am,B1,B2...Bn] */
+      return k < m ? A[k] : B[k-m];
+    }
+
+    if (B[n-1] <= A[0]) { /* [B1,B2...Bn,A1,A2...Am] */
+        return k < n ? B[k] : A[k-n];
+    }
+
+    if (B[0] >= A[0]) {  /* [A1,A2..A[h-1]...B1....Am..Bn] */
+      int h = bsearch(A, m, B[0]);
+      if (h > k || (h==k && A[h] == B[0])) 
+        return A[k]; 
+      else {
+        A += h; m -= h; k-=h;
+      }
+    } else {
+      int h = bsearch(B, n, A[0]);
+      if (h > k || (h==k && B[h] == A[0])) 
+        return B[k];
+      else {
+        B += h; n-=h;k-=h;
+      }
+  }
   }
 }
 
