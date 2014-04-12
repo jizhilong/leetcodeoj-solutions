@@ -28,23 +28,11 @@ class Solution {
   public:
     inline bool abs_ge(int n, int m) { /* abs(n) >= abs(m) */
       int sign = n ^ m;
-      if (sign < 0) {
-        if (m == 0)
-          return true;
-        else if (m > 0)
-          return n+m <= 0;
-        else
-          return n+m >= 0;
-      } else if (sign > 0){
-        if (m == 0)
-          return true;
-        else if (m > 0)
-          return n-m >= 0;
-        else
-          return n-m <= 0;
-      } else {
+      int bsign = n ^ (-m);
+      if (sign == 0 || bsign == 0)
         return true;
-      }
+
+      return sign < 0 ? ((n+m)^m) < 0 : ((n-m)^m) >= 0;
     }
 
     int divide(int dividend, int divisor) {
@@ -54,17 +42,19 @@ class Solution {
         return dividend;
       if (dividend == divisor)
         return 1;
-      int sign = 1;
-      if ((divisor ^ dividend) < 0)
-        sign = -1;
+      if ((dividend+divisor) == 0)
+        return -1;
+
+      int sign = ((divisor ^ dividend) < 0) ? -1 : 1;
 
       int ret = 0;
+      int bdivisor = sign*divisor;
       while (abs_ge(dividend, divisor)) {
-        int tmp = sign*divisor;
+        int tmp = bdivisor;
         int tret = sign;
         int tmpp = tmp + tmp;
 
-        while ((tmpp^divisor^sign) > 0 && abs_ge(dividend, tmpp)) {
+        while ((tmpp^bdivisor) > 0 && abs_ge(dividend, tmpp)) {
           tmp = tmpp;
           tret <<= 1;
           tmpp <<= 1;
@@ -83,5 +73,6 @@ main()
   Solution solution;
   assert(!solution.abs_ge(0, -1));
   cout << solution.divide(-2147483648, 2) << endl;
+  cout << solution.divide(-2147483648, -2147483648) << endl;
   cout << solution.divide(1, -1) << endl;
 }
