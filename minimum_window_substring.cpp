@@ -50,9 +50,7 @@ class Solution {
       if (T.length() > S.length() || T.length() == 0)
         return "";
       vector<int>  chars(256, 0);
-      vector<int> dp_count(256, 0);
-      vector<LN *> dp_ptr(256);
-      vector<LN *> dp_ptr_tail(256);
+      vector<LN> dp(256, LN(0));
 
       LN match_head(0);
       LN *matche_tail = &match_head;
@@ -69,11 +67,11 @@ class Solution {
         if (!chars[c])
           continue;
 
-        if (dp_count[c] < chars[c]) {
+        if (dp[c].i < chars[c]) {
           total++;
-          dp_count[c]++;
+          dp[c].i++;
         } else {
-          LN *to_delete = dp_ptr[c]->prev;
+          LN *to_delete = dp[c].next->prev;
 
           to_delete->prev->next = to_delete->next;
           if (to_delete->next) {
@@ -82,20 +80,20 @@ class Solution {
             matche_tail = to_delete->prev;
           }
 
-          dp_ptr[c] = dp_ptr[c]->next;
+          dp[c].next = dp[c].next->next;
         }
 
         matche_tail->next = new LN(i);
         matche_tail->next->prev = matche_tail;
         matche_tail = matche_tail->next;
 
-        if (dp_ptr[c] == NULL || dp_ptr_tail[c] == NULL) {
-          dp_ptr[c] = dp_ptr_tail[c] = new LN(i);
+        if (dp[c].next == NULL || dp[c].prev == NULL) {
+          dp[c].next = dp[c].prev = new LN(i);
         } else {
-          dp_ptr_tail[c]->next = new LN(i);
-          dp_ptr_tail[c] = dp_ptr_tail[c]->next;
+          dp[c].prev->next = new LN(i);
+          dp[c].prev = dp[c].prev->next;
         }
-        dp_ptr_tail[c]->prev = matche_tail;
+        dp[c].prev->prev = matche_tail;
 
 
         if (total == T.length()) {
