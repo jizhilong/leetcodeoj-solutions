@@ -40,6 +40,8 @@ class Solution {
         return ret;
       int len = L[0].size();
       int total = L.size() * len;
+      vector<int> chars(256, 0);
+
       if (s.length() < total)
         return ret;
 
@@ -49,21 +51,52 @@ class Solution {
         } else {
           map[L[i]]++;
         }
+        for (int j = 0; j < L[i].size(); j++) {
+          chars[L[i][j]]++;
+        }
       }
 
-      for (int i = 0; i <= s.length() - total; i++) {
-        unordered_map<string, int> tmpmap = map;
-        int tmptotal = L.size();
-        for (int j = i; j < i + total; j += L[0].size()) {
-          string tmp = s.substr(j, len);
-          if (tmpmap.find(tmp) == tmpmap.end() || tmpmap[tmp] == 0) {
+      vector<int> dp(256, 0);
+      int i = 0, j = 0;
+
+      while (i <= s.length() - total) {
+        while (j-i < total) {
+          char c = s[j];
+          if (chars[c] == 0) {
+            i = j+1;
+            j = i;
+            dp = vector<int>(256, 0);
             break;
+          } else if (chars[c] > dp[c]) {
+            dp[c]++;
+            j++;
           } else {
-            tmpmap[tmp]--;
-            tmptotal--;
+            while (s[i] != c) {
+              dp[s[i]]--;
+              i++;
+            }
+            i++;
+            j++;
+            break;
           }
-          if (tmptotal == 0)
+        }
+
+        if (j-i == total) {
+          unordered_map<string, int> tmpmap = map;
+          int h;
+          for (h = i; h < j; h += len) {
+            string tmp = s.substr(h, len);
+            if (tmpmap.find(tmp) == tmpmap.end() || tmpmap[tmp] == 0) {
+              break;
+            } else {
+              tmpmap[tmp]--;
+            }
+          }
+          if (h == j) {
             ret.push_back(i);
+          }
+          dp[s[i]]--;
+          i++;
         }
       }
 
@@ -74,8 +107,8 @@ class Solution {
 int
 main()
 {
-  vector<string> L = {"a", "a"};
-  string s = "a";
+  vector<string> L = {"ab", "ab"};
+  string s = "ababab";
   Solution solution;
   vector<int> res = solution.findSubstring(s, L);
   for (int i = 0; i < res.size(); i++)
