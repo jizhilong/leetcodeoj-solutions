@@ -28,21 +28,21 @@ using namespace std;
 class Solution {
   public:
     int majorityElement(vector<int> &num) {
-      sort(num.begin(), num.end());
-      int lim = num.size() / 2;
-      int begin = 0, last = num[0];
-
+      int maj = num[0], count = 1;
       for (int i = 1; i < num.size(); i++) {
-        if (num[i] != last) {
-          if ((i - begin) > lim) {
-            return last;
-          } else {
-            begin = i;
-            last = num[i];
-          }
+        if (maj == num[i]) {
+          count++;
+        } else {
+          count--;
+        }
+
+        if (count == 0) {
+          maj = num[i];
+          count = 1;
         }
       }
-     return last;
+
+      return maj;
     }
 };
 
