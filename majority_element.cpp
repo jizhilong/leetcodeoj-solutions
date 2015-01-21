@@ -30,16 +30,14 @@ class Solution {
     int majorityElement(vector<int> &num) {
       sort(num.begin(), num.end());
       int lim = num.size() / 2;
-      int count = 1, last = num[0];
+      int begin = 0, last = num[0];
 
       for (int i = 1; i < num.size(); i++) {
-        if (num[i] == last) {
-          count++;
-        } else {
-          if (count >= lim) {
+        if (num[i] != last) {
+          if ((i - begin) > lim) {
             return last;
           } else {
-            count = 1;
+            begin = i;
             last = num[i];
           }
         }
@@ -54,5 +52,5 @@ main(int argc, char *argv[]) {
   Solution s;
   vector<int> data;
   data.push_back(1);
-  cout << s.majority_element(data) << endl;
+  cout << s.majorityElement(data) << endl;
 }
