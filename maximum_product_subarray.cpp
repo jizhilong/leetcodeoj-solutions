@@ -28,7 +28,7 @@ class Solution {
   public:
     int maxProduct(int A[], int n) {
       int max, maxe, min, mine;
-      int tmaxe;
+      int tmaxe, tmp;
       max = maxe = A[0];
       min = mine = A[0];
 
@@ -36,26 +36,31 @@ class Solution {
         if (A[i] > 0) {
           if (maxe > 0) {
             maxe *= A[i];
+            if (mine <= 0) {
+              mine *= A[i];
+            } else {
+              mine = A[i];
+            }
           } else {
             maxe = A[i];
+            mine *= A[i];
           }
 
-          if (mine <= 0) {
-            mine *= A[i];
-          } else {
-            mine = A[i];
-          }
         } else if (A[i] < 0) {
           tmaxe = maxe;
           if (maxe <= 0) {
             maxe = mine * A[i];
+            tmp = tmaxe*A[i];
+            mine = A[i] < tmp ? A[i] : tmp;
           } else {
-            maxe = A[i] > A[i]*mine ? A[i] : A[i]*mine;
-          }
-          if (mine > 0) {
-            mine = tmaxe * A[i];
-          } else {
-            mine = A[i] < A[i]*tmaxe ? A[i] : A[i]*tmaxe;
+            tmp = A[i]*mine;
+            maxe = A[i] > tmp ? A[i] : tmp;
+            if (mine > 0) {
+              mine = tmaxe * A[i];
+            } else {
+              tmp = tmaxe*A[i];
+              mine = A[i] < tmp ? A[i] : tmp;
+            }
           }
         } else {
           maxe = mine = 0;
