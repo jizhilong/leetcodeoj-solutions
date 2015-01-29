@@ -31,16 +31,15 @@ using namespace std;
 class Solution {
   public:
     int findPeakElement(const vector<int> &num) {
-      int i = 0, j = num.size() - 1;
-      while (i < j) {
-        if (num[i] > num[i+1])
-          return i;
-        if (num[j] > num[j-1])
-          return j;
-        i++;
-        j--;
+      int l = 0, h = num.size() - 1;
+      while (l < h) {
+        int m = l + ((h-l) >> 1);
+        if (num[m] > num[m+1])
+          h = m;
+        else
+          l = m+1;
       }
-      return i;
+      return l;
     }
 };
 
