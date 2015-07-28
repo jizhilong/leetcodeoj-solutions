@@ -3,14 +3,11 @@
  *
  *       Filename:  maximum_gap.cpp
  *
- *    Description:  Given an unsorted array, find the maximum difference between                    the successive elements in its sorted form.
- *                  Try to solve if in linear time/space.
- *                  Return 0 if the array contains less than 2 elements.
- *                  You may assume all elements in the array are non-negative
- *                  and fit in the 32-bit signed integer range.
+ *    Description:  Given an unsorted array, find the maximum difference between the
+ *                  successive elements in its sorted form.
  *
  *        Version:  1.0
- *        Created:  01/30/2015 09:04:41 PM
+ *        Created:  02/04/2015 07:48:22 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -21,29 +18,52 @@
  */
 
 #include <vector>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
+
 
 class Solution {
   public:
     int maximumGap(vector<int> &num) {
-    if (num.size() < 2)
-      return 0;
-    sort(num.begin(), num.end());
-    int gap = num[1] - num[0];
-    for (int i = 2; i < num.size(); i++) {
-      int tgap = num[i] - num[i-1];
-      gap = tgap > gap ? tgap : gap;
-    }
+      int n = num.size();
+      if (n < 2) return 0;
+      int mi = *min_element(num.begin(), num.end());
+      int ma = *max_element(num.begin(), num.end());
+      if (mi == ma) return 0;
 
-    return gap;
-  }
+      int blen = n - 1;
+      double gap = (ma - mi) * 1.0 / blen;
+      vector<int> bs(2*n, -1);
+
+      for (int i = 0; i < n; i++) {
+        int bi = 2*(int)((num[i] - mi) / gap);
+        if (bs[bi] == -1 || num[i] < bs[bi]) bs[bi] = num[i];
+        if (bs[bi+1] == -1 || num[i] > bs[bi+1]) bs[bi+1] = num[i];
+      }
+
+      int ans = -1;
+      int last_bound = mi;
+      int m = bs.size();
+      
+      for (int i = 0; i < m; i+=2) {
+        if (bs[i] == -1)
+          continue;
+
+        ans = max(ans, bs[i]-last_bound);
+        last_bound = bs[i+1];
+      }
+      return ans;
+    }
 };
 
 
 int
-main(int argc, char *argv[]) {
-
+main(int argc, char *argv[])
+{
+  int nums[] = {1,3,5,7,0,10};
+  vector<int> vnums = vector<int>(nums, nums+sizeof(nums)/sizeof(int));
+  Solution s;
+  cout << s.maximumGap(vnums) << endl;
 }
